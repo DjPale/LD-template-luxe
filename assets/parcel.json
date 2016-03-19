@@ -1,0 +1,10 @@
+{
+    "textures" : [
+        { "id" : "assets/tiles.png" }
+    ],
+    "text" : [
+        { "id" : "assets/testmap.tmx" }
+    ],
+    "shaders" : [
+    ]
+}

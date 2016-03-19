@@ -1,0 +1,31 @@
+{
+  luxe : {
+    window:{
+      width: 800,
+      height: 600,
+      resizable: false,
+      title: '2d physics test'
+    }
+  },
+
+  project : {
+    name : '2D Physics Test',
+    version : '1.0.0',
+    author : 'dj_pale',
+
+    app : {
+      name : '2d-physics',
+      package : 'com.digitalapathy',
+    },
+
+    build : {
+      dependencies : {
+        luxe : '*'
+      }
+    },
+
+    files : {
+      assets : 'assets/'
+    }
+  }
+}

@@ -6,6 +6,7 @@ import luxe.collision.shapes.Shape;
 import luxe.collision.shapes.Polygon;
 
 import luxe.tilemaps.Tilemap;
+import luxe.importers.tiled.TiledObjectGroup;
 
 import luxe.utils.Maths;
 
@@ -61,6 +62,13 @@ class PhysicsEngine2D extends luxe.Physics.PhysicsEngine
         }
     }
 
+    public function clear()
+    {
+        while (obstacles.length > 0) obstacles.pop();
+        while (layers.length > 0) layers.pop();
+        while (bodies.length > 0) bodies.pop();
+    }
+
     public function add_body(body: Physics2DRigidBody)
     {
         bodies.push(body);
@@ -76,6 +84,39 @@ class PhysicsEngine2D extends luxe.Physics.PhysicsEngine
         var scale = layer.map.visual.options.scale;
         var collider = Polygon.rectangle(0, 0, layer.map.tile_width * scale, layer.map.tile_height * scale, false);
         layers.push({layer: layer, collider: collider});
+    }
+
+    public function add_object_collision_layer(object_group: TiledObjectGroup, ?_scale: Float = 1.0)
+    {
+        for (obj in object_group.objects)
+        {
+            if (obj.object_type == TiledObjectType.rectangle)
+            {
+                var r = Polygon.rectangle(
+                    obj.pos.x * _scale, obj.pos.y * _scale,
+                    obj.width , obj.height ,
+                    false);
+
+                r.scaleX = _scale;
+                r.scaleY = _scale;
+
+                add_obstacle_collision(r);
+            }
+            else if (obj.object_type == TiledObjectType.polygon)
+            {
+                var p = obj.polyobject;
+                var r = new Polygon(p.origin.x * _scale, p.origin.y * _scale, p.points);
+
+                r.scaleX = _scale;
+                r.scaleY = _scale;
+
+                add_obstacle_collision(r);
+            }
+            else
+            {
+                trace('warning, unkown collision object id ' + obj.id);
+            }
+        }
     }
 
     public function add_obstacle_collision(shape: Shape)
@@ -113,8 +154,6 @@ class PhysicsEngine2D extends luxe.Physics.PhysicsEngine
         if (layers.length == 0) return false;
 
         b.collider.position.add_xyz(ofs_x, ofs_y, 0);
-
-
 
         for (l in layers)
         {

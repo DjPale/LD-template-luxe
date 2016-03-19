@@ -2,14 +2,19 @@ import luxe.Input;
 import luxe.States;
 import luxe.Vector;
 
+import mint.Canvas;
+import mint.render.luxe.LuxeMintRender;
+
+
 typedef GlobalData = {
     states: States,
-    ui: phoenix.Batcher
-}
+    ui: phoenix.Batcher,
+    canvas: Canvas
+};
 
 class Main extends luxe.Game
 {
-    var global : GlobalData = { states: null, ui: null };
+    var global : GlobalData = { states: null, ui: null, canvas: null };
 
     override function config(config:luxe.AppConfig) : luxe.AppConfig
     {
@@ -24,6 +29,14 @@ class Main extends luxe.Game
         global.ui = Luxe.renderer.create_batcher({
             name: 'ui',
             layer: 1
+        });
+
+        var renderer = new LuxeMintRender();
+
+        global.canvas = new Canvas({
+            name: 'Canvas',
+            rendering: renderer,
+            x: 0, y: 0, w: Luxe.screen.w, h: Luxe.screen.h
         });
 
         // Set up batchers, states etc.

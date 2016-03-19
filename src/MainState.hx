@@ -5,12 +5,12 @@ import luxe.Vector;
 
 import luxe.collision.shapes.Polygon;
 import luxe.collision.shapes.Circle;
+import luxe.importers.tiled.TiledMap;
 
 import physics2d.PhysicsEngine2D;
 import physics2d.Physics2DBody;
 
-import luxe.importers.tiled.TiledMap;
-
+import util.DebugWindow;
 
 import Main;
 
@@ -44,11 +44,12 @@ class MainState extends State
 
     override function update(dt:Float)
     {
-        if (phys != null) _debug.text = phys.entity.pos.x + "," + phys.entity.pos.y;
     }
 
     function setup()
     {
+        var win = new DebugWindow(global.canvas, 100, 0, 200, 400);
+
         var map_data = Luxe.resources.text('assets/testmap.tmx');
 
         map = new TiledMap({
@@ -66,15 +67,15 @@ class MainState extends State
 
         physics2d.add_tile_collision_layer(map.layer('Solids'));
 
-        _debug = new Text({
-            pos: new Vector(10,10)
-        });
+        physics2d.add_object_collision_layer(map.tiledmap_data.object_groups[0], 2);
 
         var p = new luxe.Entity({
             name: 'player',
         });
 
         phys = p.add(new Physics2DBody(physics2d, { name: 'Physics2DBody' }));
+
+        win.register_watch('pos', p, 'pos', 1.0, function(v:Dynamic){ var v : Vector = cast v; return Math.round(v.x) + ',' + Math.round(v.y);  });
 
         phys.body.collider = Polygon.rectangle(64, 64, 64, 64, true);
         p.pos.copy_from(phys.body.collider.position);

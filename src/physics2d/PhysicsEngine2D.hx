@@ -192,7 +192,7 @@ class PhysicsEngine2D extends luxe.Physics.PhysicsEngine
         var d_x = b.velocity.x * Luxe.physics.step_delta;
         var d_y = b.velocity.y * Luxe.physics.step_delta;
 
-        if (!b.collides_static)
+        if (b.is_trigger)
         {
             b.collider.position.x += d_x;
             b.collider.position.y += d_y;

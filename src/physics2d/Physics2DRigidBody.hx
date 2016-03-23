@@ -11,7 +11,7 @@ class Physics2DRigidBody
 {
     public var collider : Shape = null;
     public var collides_body : Bool = false;
-    public var collides_static : Bool = true;
+    public var is_trigger : Bool = false;
     public var velocity : Vector = new Vector();
     public var damp : Vector = new Vector(0.0, 0.997);
     public var oncollision : Physics2DCollisionCallback;

@@ -10,6 +10,7 @@ import luxe.importers.tiled.TiledMap;
 import physics2d.PhysicsEngine2D;
 import physics2d.Physics2DBody;
 
+import util.DebugWatcher;
 import util.DebugWindow;
 
 import Main;
@@ -19,8 +20,8 @@ class MainState extends State
     var global : GlobalData;
     var batcher : phoenix.Batcher;
     var physics2d : PhysicsEngine2D;
+    var watcher: DebugWatcher;
 
-    var _debug : Text;
     var phys : Physics2DBody;
 
     var map : TiledMap;
@@ -48,7 +49,14 @@ class MainState extends State
 
     function setup()
     {
-        var win = new DebugWindow(global.canvas, 100, 0, 200, 400);
+        watcher = new DebugWatcher();
+
+        var win = new DebugWindow(watcher, global.layout, {
+            parent: global.canvas,
+            x: Luxe.screen.w - 256, y: 0, w: 256, h: 512,
+            w_min: 256, h_min: 256,
+            closable: false, collapsible: true, resizable: true,
+        });
 
         var map_data = Luxe.resources.text('assets/testmap.tmx');
 
@@ -75,7 +83,8 @@ class MainState extends State
 
         phys = p.add(new Physics2DBody(physics2d, { name: 'Physics2DBody' }));
 
-        win.register_watch('pos', p, 'pos', 1.0, function(v:Dynamic){ var v : Vector = cast v; return Math.round(v.x) + ',' + Math.round(v.y);  });
+        win.register_watch(p, 'pos', 0.2, DebugWatcher.fmt_vec2d);
+        win.register_watch(phys.body, 'velocity', 0.1, DebugWatcher.fmt_vec2d);
 
         phys.body.collider = Polygon.rectangle(64, 64, 64, 64, true);
         p.pos.copy_from(phys.body.collider.position);

@@ -16,7 +16,10 @@ class Physics2DBody extends luxe.Component
     public var jump_times : Int = 1;
     public var jump_pause : Float = 0.05;
 
-    var was_airborne: Bool = true;
+    // this is to help the debugger TBH - for some reason shape.position won't play nice
+    public var proxy_pos(get,set) : Vector;
+
+    public var was_airborne(default,null) : Bool = true;
 
     var jump_counter : Int = 0;
     var jump_timer : Float = 0;
@@ -80,6 +83,17 @@ class Physics2DBody extends luxe.Component
         }
 
         was_airborne = !on_ground;
+    }
+
+    public function set_proxy_pos(v:Vector) : Vector
+    {
+        body.collider.position = v;
+        return entity.pos;
+    }
+
+    public function get_proxy_pos() : Vector
+    {
+        return entity.pos;
     }
 
     public function move(x: Float, y: Float)

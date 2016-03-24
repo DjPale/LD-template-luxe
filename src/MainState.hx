@@ -51,13 +51,6 @@ class MainState extends State
     {
         watcher = new DebugWatcher();
 
-        var win = new DebugWindow(watcher, global.layout, {
-            parent: global.canvas,
-            x: Luxe.screen.w - 256, y: 0, w: 256, h: 512,
-            w_min: 256, h_min: 256,
-            closable: false, collapsible: true, resizable: true,
-        });
-
         var map_data = Luxe.resources.text('assets/testmap.tmx');
 
         map = new TiledMap({
@@ -83,8 +76,7 @@ class MainState extends State
 
         phys = p.add(new Physics2DBody(physics2d, { name: 'Physics2DBody' }));
 
-        win.register_watch(p, 'pos', 0.2, DebugWatcher.fmt_vec2d);
-        win.register_watch(phys.body, 'velocity', 0.1, DebugWatcher.fmt_vec2d);
+        setup_debug();
 
         phys.body.collider = Polygon.rectangle(64, 64, 64, 64, true);
         p.pos.copy_from(phys.body.collider.position);
@@ -103,5 +95,38 @@ class MainState extends State
 
         physics2d.add_obstacle_collision(Polygon.rectangle(0, Luxe.screen.height - 80, 20, 60, false));
         physics2d.add_obstacle_collision(Polygon.rectangle(Luxe.screen.width - 20, Luxe.screen.height - 80, 20, 60, false));
+    }
+
+    function setup_debug()
+    {
+        var win = new DebugWindow(watcher, global.layout, {
+            name: 'player-debug',
+            title: 'player',
+            parent: global.canvas,
+            x: Luxe.screen.w - 256, y: 0, w: 256, h: 256,
+            w_min: 256, h_min: 128,
+            closable: false, collapsible: true, resizable: true,
+        });
+
+        win.register_watch(phys, 'proxy_pos', 0.1,  DebugWatcher.fmt_vec2d, DebugWatcher.set_vec2d);
+        win.register_watch(phys.body, 'velocity', 0.1, DebugWatcher.fmt_vec2d);
+        win.register_watch(phys, 'move_speed', 1.0, DebugWatcher.fmt_vec2d_f, DebugWatcher.set_vec2d);
+        win.register_watch(phys.body, 'damp', 0.2, DebugWatcher.fmt_vec2d_f, DebugWatcher.set_vec2d);
+        win.register_watch(phys, 'jump_times', 1.0, null, DebugWatcher.set_int);
+        win.register_watch(phys, 'jump_counter', 0.1);
+        win.register_watch(phys, 'was_airborne', 0.1);
+
+        var win2 = new DebugWindow(watcher, global.layout, {
+            name: 'world-debug',
+            title: 'world',
+            parent: global.canvas,
+            x: Luxe.screen.w - 256, y: 256, w: 256, h: 128,
+            w_min: 256, h_min: 128,
+            closable: false, collapsible: true, resizable: true,
+        });
+
+        win2.register_watch(physics2d, 'gravity', 1.0, DebugWatcher.fmt_vec2d_f, DebugWatcher.set_vec2d);
+        win2.register_watch(physics2d, 'paused', 1.0, null, DebugWatcher.set_bool);
+        win2.register_watch(physics2d, 'draw', 1.0, null, DebugWatcher.set_bool);
     }
 }

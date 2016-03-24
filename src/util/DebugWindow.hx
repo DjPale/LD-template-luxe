@@ -2,11 +2,14 @@
 package util;
 
 import mint.Canvas;
+import mint.Control;
 import mint.Window;
 import mint.Label;
 import mint.List;
 import mint.Panel;
+import mint.TextEdit;
 import mint.layout.margins.Margins;
+import mint.types.Types;
 
 import util.DebugWatcher;
 
@@ -49,14 +52,20 @@ class DebugWindow extends Window
         ondestroy.remove(cleanup);
     }
 
-    public function register_watch(_object: Dynamic, _field: String, ?_rate: Float = 1.0, ?_callback: FormatCallback = null)
+    public function register_watch(_object: Dynamic, _field: String, ?_rate: Float = 1.0, ?_format: FormatCallback = null, ?_setter: SetterCallback = null)
     {
-        var item = create_list_item(_field);
+        var watch_item = watcher.register_watch(
+            _object, _field,
+            null, // fill in update function when creating list item
+            _rate, _format,
+            _setter
+        );
 
-        watcher.register_watch(_object, _field, function(v: String) { trace("tt"); item.text = v; }, _rate, _callback);
+        // a bit messy - but we need to determine to render a text edit or a label later and create the correct callbacks
+        create_list_item(_field, watch_item);
     }
 
-    function create_list_item(_name: String) : Label
+    function create_list_item(_name: String, _watch: WatchedValue)
     {
         var children_count = list.children.length;
         var panel = new Panel({
@@ -73,16 +82,44 @@ class DebugWindow extends Window
             x: 2, y: 2, w: panel.w / 2 - 2, h: panel.h - 2
         });
 
-        var value_label = new Label({
-            parent: panel,
-            text: '<unknown>',
-            x: panel.w / 2, y: 2, w: panel.w / 2 - 2, h: panel.h - 2
-        });
+        if (_watch.setter != null)
+        {
+            var edit = new TextEdit({
+                parent: panel,
+                text: '<unknown>',
+                text_size: 14,
+                x: panel.w / 2, y: 2, w: panel.w / 2 - 2, h: panel.h - 2
+            });
+
+            _watch.update = function(v:String)
+            {
+                if (!edit.isfocused && v != edit.text) edit.text = v;
+            }
+
+            edit.onkeydown.listen(function(k: KeyEvent, c: Control)
+            {
+                if (k.key == KeyCode.enter)
+                {
+                    edit.unfocus();
+                    watcher.set_watch(_watch, edit.text);
+                }
+            });
+        }
+        else
+        {
+            var label = new Label({
+                parent: panel,
+                text: '<unknown>',
+                align: TextAlign.left,
+                x: panel.w / 2, y: 2, w: panel.w / 2 - 2, h: panel.h - 2
+            });
+
+            _watch.update = function(v:String)
+            {
+                label.text = v;
+            };
+        }
 
         list.add_item(panel);
-
-        return value_label;
     }
-
-
 }

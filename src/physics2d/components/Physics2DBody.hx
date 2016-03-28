@@ -1,5 +1,5 @@
 
-package physics2d;
+package physics2d.components;
 
 import physics2d.PhysicsEngine2D;
 

@@ -8,7 +8,7 @@ import luxe.collision.shapes.Circle;
 import luxe.importers.tiled.TiledMap;
 
 import physics2d.PhysicsEngine2D;
-import physics2d.Physics2DBody;
+import physics2d.components.Physics2DBody;
 
 import util.DebugWatcher;
 import util.DebugWindow;
@@ -23,6 +23,7 @@ class MainState extends State
     var watcher: DebugWatcher;
 
     var phys : Physics2DBody;
+    var trigger : physics2d.Physics2DRigidBody;
 
     var map : TiledMap;
 
@@ -91,7 +92,8 @@ class MainState extends State
         physics2d.add_obstacle_collision(Polygon.rectangle(0, Luxe.screen.height - 20, Luxe.screen.width, 20, false));
         physics2d.add_obstacle_collision(Polygon.rectangle(Luxe.screen.mid.x, Luxe.screen.mid.y, 128, 20, true));
 
-        physics2d.add_obstacle_collision(new Circle(Luxe.screen.mid.x - 64, Luxe.screen.mid.y + 64, 32));
+        trigger = physics2d.add_trigger(new Circle(64, 64, 32));
+        trigger.ontrigger = function(_) { trace('trigger enter');  };
 
         physics2d.add_obstacle_collision(Polygon.rectangle(0, Luxe.screen.height - 80, 20, 60, false));
         physics2d.add_obstacle_collision(Polygon.rectangle(Luxe.screen.width - 20, Luxe.screen.height - 80, 20, 60, false));
@@ -115,6 +117,7 @@ class MainState extends State
         win.register_watch(phys, 'jump_times', 1.0, null, DebugWatcher.set_int);
         win.register_watch(phys, 'jump_counter', 0.1);
         win.register_watch(phys, 'was_airborne', 0.1);
+        win.register_watch(trigger, 'trigger_list', 0.2);
 
         var win2 = new DebugWindow(watcher, global.layout, {
             name: 'world-debug',

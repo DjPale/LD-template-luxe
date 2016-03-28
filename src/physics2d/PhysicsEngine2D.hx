@@ -23,6 +23,12 @@ class PhysicsEngine2D extends luxe.Physics.PhysicsEngine
 
     var drawer : luxe.collision.ShapeDrawerLuxe;
 
+    public static var LAYER_STATIC : Int = 1;
+    public static var DEFAULT_LAYER : Int = 2;
+    public static var MAX_LAYERS : Int = 8;
+
+    var collision_bitmasks : Array<Int>;
+
     public function new()
     {
         super();
@@ -30,6 +36,12 @@ class PhysicsEngine2D extends luxe.Physics.PhysicsEngine
         bodies = [];
         obstacles = [];
         layers = [];
+
+        collision_bitmasks = new Array<Int>();
+        for (i in 0...MAX_LAYERS)
+        {
+            collision_bitmasks[i] = (1 << MAX_LAYERS) - 1;
+        }
 
         drawer = new luxe.collision.ShapeDrawerLuxe();
     }
@@ -124,9 +136,23 @@ class PhysicsEngine2D extends luxe.Physics.PhysicsEngine
         obstacles.push(shape);
     }
 
-    inline function check_obstacle_collision(b: Physics2DRigidBody, ofs_x: Float, ofs_y: Float) : Bool
+    public function add_trigger(shape: Shape) : Physics2DRigidBody
+    {
+        var ret = new Physics2DRigidBody();
+        ret.damp = new Vector();
+        ret.is_trigger = true;
+        ret.collider = shape;
+
+        bodies.push(ret);
+
+        return ret;
+    }
+
+    function check_obstacle_collision(b: Physics2DRigidBody, ofs_x: Float, ofs_y: Float) : Bool
     {
         var ret = false;
+
+        if (!b.enabled || b.is_trigger || !layer_collides(b.layer, LAYER_STATIC)) return ret;
 
         b.collider.position.add_xyz(ofs_x, ofs_y, 0);
 
@@ -144,6 +170,34 @@ class PhysicsEngine2D extends luxe.Physics.PhysicsEngine
         return ret;
     }
 
+    public function set_collision_mask(layer: Int, mask: Int)
+    {
+        if (layer >= 0 && layer < MAX_LAYERS)
+        {
+            collision_bitmasks[layer] = mask;
+        }
+    }
+
+    public function set_collision(layer: Int, collide_layer: Int, on: Bool)
+    {
+        if (layer >= 0 && layer < MAX_LAYERS)
+        {
+            if (on)
+            {
+                collision_bitmasks[layer] |= (1 << collide_layer);
+            }
+            else
+            {
+                collision_bitmasks[layer] &= ((1 << MAX_LAYERS - 1) ^ (1 << collide_layer));
+            }
+        }
+    }
+
+    inline public function layer_collides(source: Int, target: Int) : Bool
+    {
+        return (collision_bitmasks[source] & (1 << target) != 0);
+    }
+
     inline public function check_static_collision(b: Physics2DRigidBody, ofs_x: Float, ofs_y: Float) : Bool
     {
         return check_tile_collision(b, ofs_x, ofs_y) || check_obstacle_collision(b, ofs_x, ofs_y);
@@ -151,7 +205,7 @@ class PhysicsEngine2D extends luxe.Physics.PhysicsEngine
 
     function check_tile_collision(b: Physics2DRigidBody, ofs_x: Float, ofs_y: Float) : Bool
     {
-        if (layers.length == 0) return false;
+        if (layers.length == 0 || !b.enabled || b.is_trigger || !layer_collides(b.layer, LAYER_STATIC)) return false;
 
         b.collider.position.add_xyz(ofs_x, ofs_y, 0);
 
@@ -191,13 +245,6 @@ class PhysicsEngine2D extends luxe.Physics.PhysicsEngine
     {
         var d_x = b.velocity.x * Luxe.physics.step_delta;
         var d_y = b.velocity.y * Luxe.physics.step_delta;
-
-        if (b.is_trigger)
-        {
-            b.collider.position.x += d_x;
-            b.collider.position.y += d_y;
-            return;
-        }
 
         var r_x = d_x;
         var r_y = d_y;
@@ -273,6 +320,8 @@ class PhysicsEngine2D extends luxe.Physics.PhysicsEngine
     {
         for (b in bodies)
         {
+            if (b.is_trigger || !b.enabled) continue;
+
             if (b.add.x != 0)
             {
                 b.velocity.x += b.add.x;
@@ -302,18 +351,31 @@ class PhysicsEngine2D extends luxe.Physics.PhysicsEngine
     {
         for (b in bodies)
         {
-            if (b.collider == null || !b.collides_body || b.oncollision == null) continue;
+            if (!b.enabled || b.collider == null) continue;
+
+            b.invalidate_triggers();
 
             for (tgt in bodies)
             {
-                if (b == tgt) continue;
+                if (b == tgt || !tgt.enabled || tgt.is_trigger || tgt.collider == null) continue;
 
                 var col = Collision.shapeWithShape(b.collider, tgt.collider);
                 if (col != null)
                 {
-                    b.oncollision(b, col);
+                    if (b.is_trigger)
+                    {
+                        if (!b.had_trigger(tgt) && b.ontrigger != null) b.ontrigger(tgt);
+                        b.set_trigger(tgt);
+                    }
+                    else
+                    {
+                        b.velocity.set_xy(0, 0);
+                        if (b.oncollision != null) b.oncollision(tgt, col);
+                    }
                 }
             }
+
+            b.purge_inactive_triggers();
         }
     }
 }

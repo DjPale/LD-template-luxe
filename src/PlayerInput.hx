@@ -1,6 +1,6 @@
 import luxe.Input;
 
-import physics2d.Physics2DBody;
+import physics2d.components.Physics2DBody;
 
 class PlayerInput extends luxe.Component
 {

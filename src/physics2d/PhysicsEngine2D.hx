@@ -24,7 +24,7 @@ class PhysicsEngine2D extends luxe.Physics.PhysicsEngine
     var drawer : luxe.collision.ShapeDrawerLuxe;
 
     public static var LAYER_STATIC : Int = 1;
-    public static var DEFAULT_LAYER : Int = 2;
+    public static var LAYER_DEFAULT : Int = 2;
     public static var MAX_LAYERS : Int = 8;
 
     var collision_bitmasks : Array<Int>;
@@ -56,7 +56,7 @@ class PhysicsEngine2D extends luxe.Physics.PhysicsEngine
         if (paused) return;
 
         handle_physics();
-        handle_collisions();
+        //handle_collisions();
     }
 
     override public function render()
@@ -170,30 +170,33 @@ class PhysicsEngine2D extends luxe.Physics.PhysicsEngine
         return ret;
     }
 
-    public function set_collision_mask(layer: Int, mask: Int)
+    function set_collision_mask(layer: Int, mask: Int)
     {
-        if (layer >= 0 && layer < MAX_LAYERS)
+        if (layer >= 0 && layer < MAX_LAYERS && mask < MAX_LAYERS)
         {
             collision_bitmasks[layer] = mask;
         }
     }
 
-    public function set_collision(layer: Int, collide_layer: Int, on: Bool)
+    public function set_layer_collision(layer: Int, collide_layer: Int, on: Bool, symmetric: Bool = true)
     {
-        if (layer >= 0 && layer < MAX_LAYERS)
+        if (layer >= 0 && layer < MAX_LAYERS && collide_layer >= 0 && collide_layer < MAX_LAYERS)
         {
+            // don't dare to use XOR - hence the if-test :P
             if (on)
             {
                 collision_bitmasks[layer] |= (1 << collide_layer);
+                if (symmetric) collision_bitmasks[collide_layer] |= (1 << layer);
             }
             else
             {
-                collision_bitmasks[layer] &= ((1 << MAX_LAYERS - 1) ^ (1 << collide_layer));
+                collision_bitmasks[layer] &= ~(1 << collide_layer);
+                if (symmetric) collision_bitmasks[collide_layer] &= ~(1 << layer);
             }
         }
     }
 
-    inline public function layer_collides(source: Int, target: Int) : Bool
+    inline function layer_collides(source: Int, target: Int) : Bool
     {
         return (collision_bitmasks[source] & (1 << target) != 0);
     }
@@ -320,23 +323,27 @@ class PhysicsEngine2D extends luxe.Physics.PhysicsEngine
     {
         for (b in bodies)
         {
-            if (b.is_trigger || !b.enabled) continue;
+            if (!b.enabled) continue;
 
-            if (b.add.x != 0)
+                if (b.add.x != 0)
+                {
+                    b.velocity.x += b.add.x;
+                    b.add.x = 0;
+                }
+
+                if (b.add.y != 0)
+                {
+                    b.velocity.y += b.add.y;
+                    b.add.y = 0;
+                }
+
+            if (!b.is_trigger)
             {
-                b.velocity.x += b.add.x;
-                b.add.x = 0;
+                b.velocity.x += gravity.x * Luxe.physics.step_delta;
+                b.velocity.y += gravity.y * Luxe.physics.step_delta;
             }
 
-            if (b.add.y != 0)
-            {
-                b.velocity.y += b.add.y;
-                b.add.y = 0;
-            }
-
-            b.velocity.x += gravity.x * Luxe.physics.step_delta;
-            b.velocity.y += gravity.y * Luxe.physics.step_delta;
-
+            handle_dynamic_collision(b);
             move_body(b);
 
             //b.collider.x = Math.round(b.collider.x);
@@ -347,35 +354,43 @@ class PhysicsEngine2D extends luxe.Physics.PhysicsEngine
         }
     }
 
+    inline function handle_dynamic_collision(b: Physics2DRigidBody)
+    {
+        if (!b.enabled || b.collider == null) return;
+
+        b.invalidate_triggers();
+
+        for (tgt in bodies)
+        {
+            if (b == tgt || !tgt.enabled || tgt.is_trigger || tgt.collider == null || !layer_collides(b.layer, tgt.layer)) continue;
+
+            var col = Collision.shapeWithShape(b.collider, tgt.collider);
+            if (col != null)
+            {
+                if (b.is_trigger)
+                {
+                    if (!b.had_trigger(tgt) && b.ontrigger != null) b.ontrigger(tgt);
+                    b.set_trigger(tgt);
+                }
+                else
+                {
+                    //cheating - but we are deferring movement to the move-function coming after the dynamic collisions
+                    b.velocity.copy_from(col.separation);
+                    b.velocity.divideScalar(Luxe.physics.step_delta);
+                    //b.collider.position.add(col.separation);
+                    if (b.oncollision != null) b.oncollision(tgt, col);
+                }
+            }
+        }
+
+        b.purge_inactive_triggers();
+    }
+
     function handle_collisions()
     {
         for (b in bodies)
         {
-            if (!b.enabled || b.collider == null) continue;
-
-            b.invalidate_triggers();
-
-            for (tgt in bodies)
-            {
-                if (b == tgt || !tgt.enabled || tgt.is_trigger || tgt.collider == null) continue;
-
-                var col = Collision.shapeWithShape(b.collider, tgt.collider);
-                if (col != null)
-                {
-                    if (b.is_trigger)
-                    {
-                        if (!b.had_trigger(tgt) && b.ontrigger != null) b.ontrigger(tgt);
-                        b.set_trigger(tgt);
-                    }
-                    else
-                    {
-                        b.velocity.set_xy(0, 0);
-                        if (b.oncollision != null) b.oncollision(tgt, col);
-                    }
-                }
-            }
-
-            b.purge_inactive_triggers();
+            handle_dynamic_collision(b);
         }
     }
 }

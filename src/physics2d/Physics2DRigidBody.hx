@@ -17,7 +17,7 @@ class Physics2DRigidBody
     public var damp : Vector = new Vector(0.0, 0.997);
     public var oncollision : Physics2DCollisionCallback;
     public var ontrigger : Physics2DTriggerCallback;
-    public var layer : Int = PhysicsEngine2D.DEFAULT_LAYER;
+    public var layer : Int = PhysicsEngine2D.LAYER_DEFAULT;
 
     public var add : Vector = new Vector();
 

@@ -88,8 +88,9 @@ class MainState extends State
         physics2d.add_obstacle_collision(Polygon.rectangle(0, Luxe.screen.height - 20, Luxe.screen.width, 20, false));
 
         var db = new Physics2DRigidBody();
-        db.layer = 2;
+        db.layer = 3;
         db.collider = Polygon.rectangle(32, 128, 128, 20, true);
+        physics2d.set_layer_collision(2, 3, false);
 
         physics2d.add_body(db);
 
@@ -120,6 +121,7 @@ class MainState extends State
         win.register_watch(phys, 'jump_times', 1.0, null, DebugWatcher.set_int);
         win.register_watch(phys, 'jump_counter', 0.1);
         win.register_watch(phys, 'was_airborne', 0.1);
+        win.register_watch(phys.body, 'layer', 1.0, null, DebugWatcher.set_int);
         win.register_watch(trigger, 'trigger_list', 0.2, function(v:Dynamic) { return Std.string(v == null ? '<null>' : Lambda.count(v)); } );
 
         var win2 = new DebugWindow(watcher, global.layout, {

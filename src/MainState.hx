@@ -8,6 +8,7 @@ import luxe.collision.shapes.Circle;
 import luxe.importers.tiled.TiledMap;
 
 import physics2d.PhysicsEngine2D;
+import physics2d.Physics2DRigidBody;
 import physics2d.components.Physics2DBody;
 
 import util.DebugWatcher;
@@ -23,7 +24,7 @@ class MainState extends State
     var watcher: DebugWatcher;
 
     var phys : Physics2DBody;
-    var trigger : physics2d.Physics2DRigidBody;
+    var trigger : Physics2DRigidBody;
 
     var map : TiledMap;
 
@@ -77,26 +78,28 @@ class MainState extends State
 
         phys = p.add(new Physics2DBody(physics2d, { name: 'Physics2DBody' }));
 
-        setup_debug();
-
         phys.body.collider = Polygon.rectangle(64, 64, 64, 64, true);
         p.pos.copy_from(phys.body.collider.position);
-        //phys.body.collides_static = false;
-
-        //phys.body.damp_y = 0.0;
 
         phys.set_platformer_configuration(200, 132, 0.5, 0.2, 2, true);
 
         p.add(new PlayerInput(phys));
 
         physics2d.add_obstacle_collision(Polygon.rectangle(0, Luxe.screen.height - 20, Luxe.screen.width, 20, false));
-        physics2d.add_obstacle_collision(Polygon.rectangle(Luxe.screen.mid.x, Luxe.screen.mid.y, 128, 20, true));
+
+        var db = new Physics2DRigidBody();
+        db.layer = 2;
+        db.collider = Polygon.rectangle(32, 128, 128, 20, true);
+
+        physics2d.add_body(db);
 
         trigger = physics2d.add_trigger(new Circle(64, 64, 32));
         trigger.ontrigger = function(_) { trace('trigger enter');  };
 
         physics2d.add_obstacle_collision(Polygon.rectangle(0, Luxe.screen.height - 80, 20, 60, false));
         physics2d.add_obstacle_collision(Polygon.rectangle(Luxe.screen.width - 20, Luxe.screen.height - 80, 20, 60, false));
+
+        setup_debug();
     }
 
     function setup_debug()
@@ -117,7 +120,7 @@ class MainState extends State
         win.register_watch(phys, 'jump_times', 1.0, null, DebugWatcher.set_int);
         win.register_watch(phys, 'jump_counter', 0.1);
         win.register_watch(phys, 'was_airborne', 0.1);
-        win.register_watch(trigger, 'trigger_list', 0.2);
+        win.register_watch(trigger, 'trigger_list', 0.2, function(v:Dynamic) { return Std.string(v == null ? '<null>' : Lambda.count(v)); } );
 
         var win2 = new DebugWindow(watcher, global.layout, {
             name: 'world-debug',

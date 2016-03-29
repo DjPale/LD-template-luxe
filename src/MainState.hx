@@ -109,7 +109,7 @@ class MainState extends State
             name: 'player-debug',
             title: 'player',
             parent: global.canvas,
-            x: Luxe.screen.w - 256, y: 0, w: 256, h: 256,
+            x: Luxe.screen.w - 256, y: 0, w: 256, h: 384,
             w_min: 256, h_min: 128,
             closable: false, collapsible: true, resizable: true,
         });
@@ -118,17 +118,19 @@ class MainState extends State
         win.register_watch(phys.body, 'velocity', 0.1, DebugWatcher.fmt_vec2d);
         win.register_watch(phys, 'move_speed', 1.0, DebugWatcher.fmt_vec2d_f, DebugWatcher.set_vec2d);
         win.register_watch(phys.body, 'damp', 0.2, DebugWatcher.fmt_vec2d_f, DebugWatcher.set_vec2d);
+        win.register_watch(phys.body, 'is_trigger', 0.2, null, DebugWatcher.set_bool);
+        win.register_watch(phys.body, 'collision_response', 0.2, null, DebugWatcher.set_bool);
         win.register_watch(phys, 'jump_times', 1.0, null, DebugWatcher.set_int);
         win.register_watch(phys, 'jump_counter', 0.1);
-        win.register_watch(phys, 'was_airborne', 0.1);
         win.register_watch(phys.body, 'layer', 1.0, null, DebugWatcher.set_int);
+        win.register_watch(phys, 'was_airborne', 0.1);
         win.register_watch(trigger, 'trigger_list', 0.2, function(v:Dynamic) { return Std.string(v == null ? '<null>' : Lambda.count(v)); } );
 
         var win2 = new DebugWindow(watcher, global.layout, {
             name: 'world-debug',
             title: 'world',
             parent: global.canvas,
-            x: Luxe.screen.w - 256, y: 256, w: 256, h: 128,
+            x: Luxe.screen.w - 256, y: 384, w: 256, h: 128,
             w_min: 256, h_min: 128,
             closable: false, collapsible: true, resizable: true,
         });

@@ -374,10 +374,25 @@ class PhysicsEngine2D extends luxe.Physics.PhysicsEngine
                 }
                 else
                 {
-                    //cheating - but we are deferring movement to the move-function coming after the dynamic collisions
-                    b.velocity.copy_from(col.separation);
-                    b.velocity.divideScalar(Luxe.physics.step_delta);
-                    //b.collider.position.add(col.separation);
+                    if (b.collision_response)
+                    {
+                        // just "aligned" - only unitVector will be set
+                        if (col.overlap == 0)
+                        {
+                            // b.velocity.copy_from(col.unitVector);
+                            // b.velocity.multiplyScalar(0.1);
+                            // b.velocity.divideScalar(Luxe.physics.step_delta);
+                        }
+                        else
+                        {
+                            //cheating - but we are deferring movement to the move-function coming after the dynamic collisions
+                            b.velocity.copy_from(col.separation);
+                            b.velocity.divideScalar(Luxe.physics.step_delta);
+                            //b.collider.position.add(col.separation);
+
+                        }
+                    }
+                    
                     if (b.oncollision != null) b.oncollision(tgt, col);
                 }
             }

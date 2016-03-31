@@ -4,17 +4,17 @@
       width: 800,
       height: 600,
       resizable: false,
-      title: '2d physics test'
+      title: 'LD Template Luxe - 2016'
     }
   },
 
   project : {
-    name : '2D Physics Test',
+    name : 'LD Template Luxe - 2016',
     version : '1.0.0',
     author : 'dj_pale',
 
     app : {
-      name : '2d-physics',
+      name : 'LD-template-2016',
       package : 'com.digitalapathy',
     },
 

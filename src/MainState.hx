@@ -26,6 +26,9 @@ class MainState extends State
     var phys : Physics2DBody;
     var trigger : Physics2DRigidBody;
 
+    var dispatcher : MessageDispatcher;
+    var factory : TiledMapObjectFactory;
+
     var map : TiledMap;
 
     public function new(_global:GlobalData, _batcher:phoenix.Batcher)
@@ -55,22 +58,26 @@ class MainState extends State
 
         var map_data = Luxe.resources.text('assets/testmap.tmx');
 
+        var map_scale = 2.0;
+
         map = new TiledMap({
             tiled_file_data: map_data.asset.text,
             format: 'tmx'
         });
 
+        factory = new TiledMapObjectFactory(map, physics2d);
+
         map.display({
-            scale: 2
+            scale: map_scale
         });
 
         physics2d.gravity.set_xy(0, 10);
         physics2d.draw = true;
         physics2d.paused = false;
 
-        physics2d.add_tile_collision_layer(map.layer('Solids'));
-
-        physics2d.add_object_collision_layer(map.tiledmap_data.object_groups[0], 2);
+        factory.register_tile_collision_layer('Solids');
+        factory.register_object_collision_layer('Solid Objects', map_scale);
+        factory.register_trigger_layer('Trigger Objects', map_scale);
 
         var p = new luxe.Entity({
             name: 'player',
@@ -99,6 +106,9 @@ class MainState extends State
 
         physics2d.add_obstacle_collision(Polygon.rectangle(0, Luxe.screen.height - 80, 20, 60, false));
         physics2d.add_obstacle_collision(Polygon.rectangle(Luxe.screen.width - 20, Luxe.screen.height - 80, 20, 60, false));
+
+        dispatcher = new MessageDispatcher(map);
+        dispatcher.register_triggers();
 
         setup_debug();
     }

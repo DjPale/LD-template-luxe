@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objecttypes>
+ <objecttype name="MessageTrigger" color="#00ffff">
+  <property name="Message" type="string"/>
+  <property name="Message2" type="string"/>
+  <property name="Once" type="bool"/>
+  <property name="Parameters" type="string"/>
+  <property name="Parameters2" type="string"/>
+ </objecttype>
+ <objecttype name="Enemy" color="#ff5500">
+  <property name="Hitpoints" type="string"/>
+  <property name="Type" type="string"/>
+ </objecttype>
+</objecttypes>

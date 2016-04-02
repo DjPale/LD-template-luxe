@@ -1,0 +1,14 @@
+{
+    "prefabs" : [
+        {
+            "name" : "Enemy",
+            "properties" : [
+            ],
+            "components" : [
+                "name" : "Physics2DTrigger",
+                "properties" : [
+                ]
+            ]
+        }
+    ]
+}

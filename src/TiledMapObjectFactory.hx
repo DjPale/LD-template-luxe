@@ -62,6 +62,9 @@ class TiledMapObjectFactory
         }
     }
 
+    // 1. Check for prefabs
+    // 2. Check for class which inherits entity
+    // 3. Check for component (create entity and attach component)
     public function register_entity_layer(name: String, ?_scale: Float = 1.0)
     {
         var group = find_group(name);
@@ -71,6 +74,8 @@ class TiledMapObjectFactory
             trace('Could not find entity group layer with name $name');
             return;
         }
+
+
     }
 
     public static function apply_properties(obj: Dynamic, props: Map<String,String>)

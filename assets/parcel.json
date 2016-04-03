@@ -6,5 +6,8 @@
         { "id" : "assets/testmap.tmx" }
     ],
     "shaders" : [
+    ],
+    "json" : [
+        { "id" : "assets/prefabs.json" }
     ]
 }

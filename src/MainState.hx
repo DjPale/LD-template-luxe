@@ -111,6 +111,13 @@ class MainState extends State
         dispatcher.register_triggers();
 
         setup_debug();
+
+        var prefabz = Luxe.resources.json('assets/prefabs.json').asset.json;
+        trace(prefabz);
+        trace(prefabz.prefabs[0].base);
+        trace(prefabz.prefabs[1].name);
+
+
     }
 
     function setup_debug()

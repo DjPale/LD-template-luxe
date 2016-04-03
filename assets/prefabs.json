@@ -3,11 +3,28 @@
         {
             "name" : "Enemy",
             "properties" : [
+                {
+                    "hitpoints" : 20
+                }
             ],
             "components" : [
-                "name" : "Physics2DTrigger",
-                "properties" : [
-                ]
+                {
+                    "name" : "Physics2DTrigger",
+                    "properties" : [
+                        {
+                            "message" : "baller"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name" : "Enemy2",
+            "base" : "Enemy",
+            "properties" : [
+                {
+                    "hitpoints" : 30
+                }
             ]
         }
     ]

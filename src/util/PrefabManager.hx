@@ -47,7 +47,9 @@ class PrefabManager
             var p : Prefab = { name: prefab.name, base: prefab.base, properties: null, components: null };
             prefabs.set(p.name, p);
 
-            p.properties = get_properties_with_components(prefab.properties);
+            var tmp_props = ReflectionHelper.json_to_properties(prefab.properties);
+
+            p.properties = get_properties_with_components(tmp_props);
 
             var components : Array<Dynamic> = prefab.components;
             if (components == null || components.length == 0) continue;
@@ -63,19 +65,15 @@ class PrefabManager
         }
     }
 
-    function get_properties_with_components(props: Dynamic) : Map<String,Map<String,String>>
+    public static function get_properties_with_components(props: Map<String,String>) : Map<String,Map<String,String>>
     {
         var ret = null;
 
         if (props == null) return ret;
 
-        var tmp_props = ReflectionHelper.json_to_properties(props);
-
-        if (tmp_props == null) return ret;
-
         ret = new Map<String,Map<String,String>>();
 
-        for (k in tmp_props.keys())
+        for (k in props.keys())
         {
             var comp_id = ROOT;
             var comp_key = k;
@@ -88,13 +86,13 @@ class PrefabManager
             }
 
             if (ret[comp_id] == null) ret.set(comp_id, new Map<String,String>());
-            ret[comp_id].set(comp_key, tmp_props[k]);
+            ret[comp_id].set(comp_key, props[k]);
         }
 
         return ret;
     }
 
-    function apply_properties_with_components(entity: Entity, props: Map<String,Map<String,String>>)
+    public static function apply_properties_with_components(entity: Entity, props: Map<String,Map<String,String>>)
     {
         if (props == null) return;
 
@@ -116,7 +114,7 @@ class PrefabManager
         }
     }
 
-    function build_constructor(clist: Array<String>) : Array<Dynamic>
+    public function build_constructor(clist: Array<String>) : Array<Dynamic>
     {
         var ret = [];
 

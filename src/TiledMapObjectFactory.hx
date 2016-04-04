@@ -1,3 +1,4 @@
+import luxe.Entity;
 import luxe.importers.tiled.TiledMap;
 import luxe.importers.tiled.TiledObjectGroup;
 
@@ -102,11 +103,24 @@ class TiledMapObjectFactory
             if (prefabs.has_prefab(obj.type))
             {
                 prefabs.register_var("$shape", shape);
+
                 entity = prefabs.instantiate(obj.type);
                 entity.pos.copy_from(obj.pos);
                 entity.name = obj.name;
 
-                prefabs.register_var("$shape", shape);
+                prefabs.register_var("$shape", null);
+            }
+            else
+            {
+                entity = ReflectionHelper.try_instantiate(obj.type);
+            }
+
+            // apply any tiled-specific properties in the same styles as prefabs
+            // ie. '[component.]key = value'
+            if (entity != null && obj.properties != null)
+            {
+                var props = PrefabManager.get_properties_with_components(obj.properties);
+                PrefabManager.apply_properties_with_components(entity, props);
             }
         }
     }

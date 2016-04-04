@@ -16,7 +16,7 @@ class ReflectionHelper
         }
     }
 
-    public static function json_to_properties(props : Dynamic) : Map<String,String>
+    public static function json_to_properties(props: Dynamic) : Map<String,String>
     {
         var ret  = null;
 
@@ -29,6 +29,16 @@ class ReflectionHelper
             ret.set(f, Reflect.field(props, f));
         }
 
+        return ret;
+    }
+
+    public static function try_instantiate<T>(name: String) : T
+    {
+        var cl = Type.resolveClass(name);
+
+        if (cl == null) return null;
+
+        var ret : T = cast Type.createInstance(cl, []);
         return ret;
     }
 }

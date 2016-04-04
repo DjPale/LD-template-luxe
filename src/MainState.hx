@@ -13,6 +13,7 @@ import physics2d.components.Physics2DBody;
 
 import util.DebugWatcher;
 import util.DebugWindow;
+import util.PrefabManager;
 
 import Main;
 
@@ -28,6 +29,7 @@ class MainState extends State
 
     var dispatcher : MessageDispatcher;
     var factory : TiledMapObjectFactory;
+    var prefabs : PrefabManager;
 
     var map : TiledMap;
 
@@ -39,6 +41,8 @@ class MainState extends State
         batcher = _batcher;
 
         physics2d = Luxe.physics.add_engine(PhysicsEngine2D);
+
+        prefabs = new PrefabManager();
     }
 
     override function onenter<T>(ignored:T)
@@ -112,12 +116,11 @@ class MainState extends State
 
         setup_debug();
 
-        var prefabz = Luxe.resources.json('assets/prefabs.json').asset.json;
-        trace(prefabz);
-        trace(prefabz.prefabs[0].base);
-        trace(prefabz.prefabs[1].name);
+        var prefab_res = Luxe.resources.json('assets/prefabs.json');
+        prefabs.load_from_resouce(prefab_res);
 
-
+        prefabs.register_var("physics2d", physics2d);
+        prefabs.instantiate("Enemy");
     }
 
     function setup_debug()

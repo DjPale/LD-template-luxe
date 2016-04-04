@@ -4,6 +4,8 @@ import luxe.importers.tiled.TiledObjectGroup;
 import physics2d.PhysicsEngine2D;
 import physics2d.components.Physics2DTrigger;
 
+import util.ReflectionHelper;
+
 class TiledMapObjectFactory
 {
     var map: TiledMap;
@@ -58,7 +60,7 @@ class TiledMapObjectFactory
             });
 
             var trigger = entity.add(new Physics2DTrigger(physics2d, shape));
-            apply_properties(trigger, obj.properties);
+            ReflectionHelper.apply_properties(trigger, obj.properties);
         }
     }
 
@@ -76,16 +78,6 @@ class TiledMapObjectFactory
         }
 
 
-    }
-
-    public static function apply_properties(obj: Dynamic, props: Map<String,String>)
-    {
-        if (props == null) return;
-
-        for (p in props.keys())
-        {
-            Reflect.setProperty(obj, p.toLowerCase(), props[p]);
-        }
     }
 
     public inline function find_group(name: String) : TiledObjectGroup

@@ -70,7 +70,7 @@ class PhysicsEngine2D extends luxe.Physics.PhysicsEngine
 
         for (b in bodies)
         {
-            drawer.drawShape(b.collider);
+            if (b.collider != null) drawer.drawShape(b.collider);
         }
     }
 
@@ -406,7 +406,7 @@ class PhysicsEngine2D extends luxe.Physics.PhysicsEngine
 
                         }
                     }
-                    
+
                     if (b.oncollision != null) b.oncollision(tgt, col);
                 }
             }

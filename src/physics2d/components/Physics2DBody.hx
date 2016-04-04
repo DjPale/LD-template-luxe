@@ -49,7 +49,7 @@ class Physics2DBody extends luxe.Component
 
     override public function update(dt: Float)
     {
-        this.pos.copy_from(body.collider.position);
+        if (body != null && body.collider != null) this.pos.copy_from(body.collider.position);
 
         check_state(dt);
     }

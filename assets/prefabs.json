@@ -9,7 +9,8 @@
             ],
             "components" : [
                 {
-                    "name" : "Physics2DTrigger",
+                    "name" : "physics2d.components.Physics2DTrigger",
+                    "constructor" : ["physics2d"],
                     "properties" : [
                         {
                             "message" : "baller"

@@ -2,31 +2,25 @@
     "prefabs" : [
         {
             "name" : "Enemy",
-            "properties" : [
-                {
-                    "hitpoints" : 20
-                }
-            ],
             "components" : [
                 {
                     "name" : "physics2d.components.Physics2DTrigger",
-                    "constructor" : ["physics2d"],
-                    "properties" : [
-                        {
-                            "message" : "baller"
-                        }
-                    ]
+                    "constructor" : ["physics2d", "$shape"],
+                    "properties" :
+                    {
+                            "message" : "base message"
+                    }
                 }
             ]
         },
         {
             "name" : "Enemy2",
             "base" : "Enemy",
-            "properties" : [
-                {
-                    "hitpoints" : 30
-                }
-            ]
+            "properties" :
+            {
+                    "name" : "gnålpung",
+                    "Physics2DTrigger.message" : "overriden message"
+            }
         }
     ]
 }

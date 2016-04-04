@@ -13,7 +13,7 @@ typedef PrefabComponent = {
 typedef Prefab = {
     name: String,
     base: String,
-    properties: Map<String, String>,
+    properties: Map<String, Map<String,String>>,
     components: Array<PrefabComponent>
 };
 
@@ -23,6 +23,8 @@ class PrefabManager
 
     var prefabs : Map<String,Prefab>;
     var var_list : Map<String,Dynamic>;
+
+    static var ROOT : String = "root";
 
     public function new()
     {
@@ -45,7 +47,7 @@ class PrefabManager
             var p : Prefab = { name: prefab.name, base: prefab.base, properties: null, components: null };
             prefabs.set(p.name, p);
 
-            p.properties = ReflectionHelper.json_to_properties(prefab.properties);
+            p.properties = get_properties_with_components(prefab.properties);
 
             var components : Array<Dynamic> = prefab.components;
             if (components == null || components.length == 0) continue;
@@ -57,6 +59,59 @@ class PrefabManager
                 var comp : PrefabComponent = { name: c.name, constructor: c.constructor, properties: null };
                 comp.properties = ReflectionHelper.json_to_properties(c.properties);
                 p.components.push(comp);
+            }
+        }
+    }
+
+    function get_properties_with_components(props: Dynamic) : Map<String,Map<String,String>>
+    {
+        var ret = null;
+
+        if (props == null) return ret;
+
+        var tmp_props = ReflectionHelper.json_to_properties(props);
+
+        if (tmp_props == null) return ret;
+
+        ret = new Map<String,Map<String,String>>();
+
+        for (k in tmp_props.keys())
+        {
+            var comp_id = ROOT;
+            var comp_key = k;
+
+            var dot = k.indexOf(".");
+            if (dot != -1 && dot < k.length - 1)
+            {
+                comp_id = k.substring(0, dot);
+                comp_key = k.substring(dot + 1);
+            }
+
+            if (ret[comp_id] == null) ret.set(comp_id, new Map<String,String>());
+            ret[comp_id].set(comp_key, tmp_props[k]);
+        }
+
+        return ret;
+    }
+
+    function apply_properties_with_components(entity: Entity, props: Map<String,Map<String,String>>)
+    {
+        if (props == null) return;
+
+        var keys = props.keys();
+        for (k in keys)
+        {
+            if (k == ROOT)
+            {
+                ReflectionHelper.apply_properties(entity, props[k]);
+            }
+            else
+            {
+                var comp = entity.get(k);
+                if (comp != null)
+                {
+                    ReflectionHelper.apply_properties(comp, props[k]);
+                }
             }
         }
     }
@@ -83,9 +138,18 @@ class PrefabManager
 
         if (prefab == null) return ret;
 
-        ret = Type.createInstance(Entity, []);
+        if (has_prefab(prefab.base))
+        {
+            ret = instantiate(prefab.base);
+        }
+        else
+        {
+            ret = Type.createInstance(Entity, []);
+        }
 
-        ReflectionHelper.apply_properties(ret, prefab.properties);
+        if (ret == null) return ret;
+
+        apply_properties_with_components(ret, prefab.properties);
 
         if (prefab.components == null) return ret;
 
@@ -102,15 +166,23 @@ class PrefabManager
             ret.add(component);
         }
 
-        trace(ret);
-
         return ret;
     }
 
 
     public function clear()
     {
+        var pkeys = prefabs.keys();
 
+        for (pk in pkeys) prefabs.remove(pk);
+
+        var vkeys = var_list.keys();
+
+        for (vk in vkeys)
+        {
+            var_list.set(vk, null);
+            var_list.remove(vk);
+        }
     }
 
     public function reload()
@@ -121,11 +193,6 @@ class PrefabManager
 
     public function has_prefab(name: String) : Bool
     {
-        return false;
-    }
-
-    public function load_prefab(name: String) : Entity
-    {
-        return null;
+        return prefabs.exists(name);
     }
 }

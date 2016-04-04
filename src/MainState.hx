@@ -13,7 +13,6 @@ import physics2d.components.Physics2DBody;
 
 import util.DebugWatcher;
 import util.DebugWindow;
-import util.PrefabManager;
 
 import Main;
 
@@ -29,7 +28,7 @@ class MainState extends State
 
     var dispatcher : MessageDispatcher;
     var factory : TiledMapObjectFactory;
-    var prefabs : PrefabManager;
+
 
     var map : TiledMap;
 
@@ -41,8 +40,6 @@ class MainState extends State
         batcher = _batcher;
 
         physics2d = Luxe.physics.add_engine(PhysicsEngine2D);
-
-        prefabs = new PrefabManager();
     }
 
     override function onenter<T>(ignored:T)
@@ -69,7 +66,7 @@ class MainState extends State
             format: 'tmx'
         });
 
-        factory = new TiledMapObjectFactory(map, physics2d);
+        factory = new TiledMapObjectFactory('assets/prefabs.json', map, physics2d);
 
         map.display({
             scale: map_scale
@@ -82,6 +79,7 @@ class MainState extends State
         factory.register_tile_collision_layer('Solids');
         factory.register_object_collision_layer('Solid Objects', map_scale);
         factory.register_trigger_layer('Trigger Objects', map_scale);
+        factory.register_entity_layer('Trigger Objects', map_scale);
 
         var p = new luxe.Entity({
             name: 'player',
@@ -115,12 +113,6 @@ class MainState extends State
         dispatcher.register_triggers();
 
         setup_debug();
-
-        var prefab_res = Luxe.resources.json('assets/prefabs.json');
-        prefabs.load_from_resouce(prefab_res);
-
-        prefabs.register_var("physics2d", physics2d);
-        prefabs.instantiate("Enemy");
     }
 
     function setup_debug()

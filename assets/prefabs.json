@@ -1,26 +1,34 @@
 {
+    "components" : [
+        {
+            "name" : "physics2d.components.Physics2DTrigger",
+            "constructor" : ["physics2d", "$shape"]
+        },
+        {
+            "name" : "behavior.components.DamageInteractor",
+        }
+    ],
     "prefabs" : [
         {
             "name" : "Enemy",
             "components" : [
+                "Physics2DTrigger",
+                "DamageInteractor",
+            ],
+            "properties" :
                 {
-                    "name" : "physics2d.components.Physics2DTrigger",
-                    "constructor" : ["physics2d", "$shape"],
-                    "properties" :
-                    {
-                            "message" : "base message"
-                    }
+                    "active" : "true",
+                    ""
                 }
-            ]
         },
         {
             "name" : "Enemy2",
             "base" : "Enemy",
             "properties" :
-            {
+                {
                     "name" : "gnålpung",
                     "Physics2DTrigger.message" : "overriden message"
-            }
+                }
         }
     ]
 }

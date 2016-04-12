@@ -28,7 +28,7 @@ class CameraFollow extends Component
     {
         if (cam == null || target == null) return;
 
-        cam.center.copy_from(target);
+        cam.pos.set_xy(target.x - cam.viewport.w / 2, target.y - cam.viewport.h / 2);
 
         if (cam.pos.x < bounds.x) cam.pos.x = bounds.x;
         if (cam.pos.y < bounds.y) cam.pos.y = bounds.y;

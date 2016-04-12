@@ -44,7 +44,9 @@ class Main extends luxe.Game
 
     function setup_canvas()
     {
-        var renderer = new LuxeMintRender();
+        var renderer = new LuxeMintRender({
+            batcher: global.ui
+        });
 
         var canvas = new util.AutoCanvas({
             name: 'Canvas',

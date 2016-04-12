@@ -95,7 +95,7 @@ class MainState extends State
         var cam = new behavior.CameraFollow();
         Luxe.camera.add(cam);
         cam.target = p.pos;
-        cam.bounds.set(0, 0, 10, 10);
+        cam.bounds.set(0, 0, 100, 0);
 
         physics2d.add_obstacle_collision(Polygon.rectangle(0, Luxe.screen.height - 20, Luxe.screen.width, 20, false));
 
@@ -150,6 +150,7 @@ class MainState extends State
             closable: false, collapsible: true, resizable: true,
         });
 
+        win2.register_watch(Luxe.camera, 'pos', 0.1, DebugWatcher.fmt_vec2d);
         win2.register_watch(physics2d, 'gravity', 1.0, DebugWatcher.fmt_vec2d_f, DebugWatcher.set_vec2d);
         win2.register_watch(physics2d, 'paused', 1.0, null, DebugWatcher.set_bool);
         win2.register_watch(physics2d, 'draw', 1.0, null, DebugWatcher.set_bool);

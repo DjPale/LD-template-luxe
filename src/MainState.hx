@@ -92,6 +92,11 @@ class MainState extends State
 
         p.add(new PlayerInput(phys));
 
+        var cam = new behavior.CameraFollow();
+        Luxe.camera.add(cam);
+        cam.target = p.pos;
+        cam.bounds.set(0, 0, 10, 10);
+
         physics2d.add_obstacle_collision(Polygon.rectangle(0, Luxe.screen.height - 20, Luxe.screen.width, 20, false));
 
         var db = new Physics2DRigidBody();

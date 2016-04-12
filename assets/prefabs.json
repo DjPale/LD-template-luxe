@@ -5,20 +5,23 @@
             "constructor" : ["physics2d", "$shape"]
         },
         {
-            "name" : "behavior.components.DamageInteractor",
+            "name" : "physics2d.components.Physics2DBody",
+            "constructor" : ["physics2d", "$shape"]
+        },
+        {
+            "name" : "behavior.components.DamageInteractor"
         }
     ],
     "prefabs" : [
         {
             "name" : "Enemy",
             "components" : [
-                "Physics2DTrigger",
-                "DamageInteractor",
+                "Physics2DBody"
             ],
             "properties" :
                 {
-                    "active" : "true",
-                    ""
+                    "Physics2DBody.move_speed.x" : 11,
+                    "Physics2DBody.move_speed.y" : 12
                 }
         },
         {

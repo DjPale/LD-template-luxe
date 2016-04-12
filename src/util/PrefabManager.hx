@@ -7,20 +7,20 @@ import luxe.resource.Resource;
 typedef PrefabComponent = {
     name: String,
     constructor: Array<String>,
-    properties: Map<String,String>
-}
+};
 
 typedef Prefab = {
     name: String,
     base: String,
     properties: Map<String, Map<String,String>>,
-    components: Array<PrefabComponent>
+    components: Array<String>
 };
 
 class PrefabManager
 {
     var res : JSONResource;
 
+    var components : Map<String,PrefabComponent>;
     var prefabs : Map<String,Prefab>;
     var var_list : Map<String,Dynamic>;
 
@@ -29,6 +29,7 @@ class PrefabManager
     public function new()
     {
         prefabs = new Map<String,Prefab>();
+        components = new Map<String,PrefabComponent>();
         var_list = new Map<String,Dynamic>();
     }
 
@@ -37,9 +38,18 @@ class PrefabManager
         var_list.set(name, obj);
     }
 
-    public function load_from_resouce(_res: JSONResource)
+    public function load_from_resource(_res: JSONResource)
     {
         var json = _res.asset.json;
+
+        var it_components : Array<Dynamic> = json.components;
+        for (comp in it_components)
+        {
+            var c : PrefabComponent = { name: comp.name, constructor: comp.constructor };
+            var idx = c.name.lastIndexOf(".");
+            components.set(c.name.substr(idx + 1), c);
+        }
+
         var it_prefabs : Array<Dynamic> = json.prefabs;
 
         for (prefab in it_prefabs)
@@ -51,17 +61,7 @@ class PrefabManager
 
             p.properties = get_properties_with_components(tmp_props);
 
-            var components : Array<Dynamic> = prefab.components;
-            if (components == null || components.length == 0) continue;
-
-            p.components = new Array<PrefabComponent>();
-
-            for (c in components)
-            {
-                var comp : PrefabComponent = { name: c.name, constructor: c.constructor, properties: null };
-                comp.properties = ReflectionHelper.json_to_properties(c.properties);
-                p.components.push(comp);
-            }
+            p.components = prefab.components;
         }
     }
 
@@ -92,7 +92,7 @@ class PrefabManager
         return ret;
     }
 
-    public static function apply_properties_with_components(entity: Entity, props: Map<String,Map<String,String>>)
+    public function apply_properties_with_components(entity: Entity, props: Map<String,Map<String,String>>, ?auto_create_comps : Bool = false)
     {
         if (props == null) return;
 
@@ -106,6 +106,11 @@ class PrefabManager
             else
             {
                 var comp = entity.get(k);
+                if (comp == null && auto_create_comps)
+                {
+                    comp = instantiate_component(k);
+                }
+
                 if (comp != null)
                 {
                     ReflectionHelper.apply_properties(comp, props[k]);
@@ -128,7 +133,18 @@ class PrefabManager
         return ret;
     }
 
-    public function instantiate(name: String) : Entity
+    public function instantiate_component(name: String) : luxe.Component
+    {
+        var pfcomp = components.get(name);
+
+        if (pfcomp == null) return null;
+
+        var cl = Type.resolveClass(pfcomp.name);
+        var constr = build_constructor(pfcomp.constructor);
+        return Type.createInstance(cl, constr);
+    }
+
+    public function instantiate(name: String) : luxe.Entity
     {
         var ret = null;
 
@@ -147,26 +163,21 @@ class PrefabManager
 
         if (ret == null) return ret;
 
-        apply_properties_with_components(ret, prefab.properties);
-
-        if (prefab.components == null) return ret;
-
         for (comp in prefab.components)
         {
-            var cl = Type.resolveClass(comp.name);
-            var constr = build_constructor(comp.constructor);
-            var component = Type.createInstance(cl, constr);
+            var component = instantiate_component(comp);
 
             if (component == null) return null;
-
-            ReflectionHelper.apply_properties(component, comp.properties);
 
             ret.add(component);
         }
 
+        apply_properties_with_components(ret, prefab.properties);
+
+        if (prefab.components == null) return ret;
+
         return ret;
     }
-
 
     public function clear()
     {
@@ -186,7 +197,7 @@ class PrefabManager
     public function reload()
     {
         clear();
-        load_from_resouce(res);
+        load_from_resource(res);
     }
 
     public function has_prefab(name: String) : Bool

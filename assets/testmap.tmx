@@ -4,8 +4,12 @@
   <image source="tiles.png" width="64" height="32"/>
  </tileset>
  <objectgroup name="Entity Objects">
-  <object id="19" name="Enemy" type="BasicEnemy" x="200" y="64" width="16" height="24"/>
-  <object id="23" name="SmallEnemy" x="424" y="168" width="16" height="24"/>
+  <object id="19" name="Enemy1" type="Enemy" x="200" y="64" width="16" height="24">
+   <properties>
+    <property name="Physics2DBody.body.damp.y" type="float" value="0"/>
+   </properties>
+  </object>
+  <object id="23" name="SmallEnemy" type="Invalid" x="424" y="168" width="16" height="24"/>
  </objectgroup>
  <objectgroup name="Trigger Objects">
   <object id="10" type="MessageTrigger" x="320" y="128" width="32" height="64">

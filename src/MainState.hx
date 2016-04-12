@@ -79,15 +79,13 @@ class MainState extends State
         factory.register_tile_collision_layer('Solids');
         factory.register_object_collision_layer('Solid Objects', map_scale);
         factory.register_trigger_layer('Trigger Objects', map_scale);
-        factory.register_entity_layer('Trigger Objects', map_scale);
+        factory.register_entity_layer('Entity Objects', map_scale);
 
         var p = new luxe.Entity({
             name: 'player',
         });
 
-        phys = p.add(new Physics2DBody(physics2d, { name: 'Physics2DBody' }));
-
-        phys.body.collider = Polygon.rectangle(64, 64, 64, 64, true);
+        phys = p.add(new Physics2DBody(physics2d, Polygon.rectangle(64, 64, 64, 64, true), { name: 'Physics2DBody' }));
         p.pos.copy_from(phys.body.collider.position);
 
         phys.set_platformer_configuration(200, 132, 0.5, 0.2, 2, true);

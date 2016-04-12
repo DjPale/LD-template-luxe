@@ -1,6 +1,8 @@
 
 package physics2d.components;
 
+import luxe.collision.shapes.Shape;
+
 import physics2d.PhysicsEngine2D;
 
 import luxe.Vector;
@@ -24,7 +26,7 @@ class Physics2DBody extends luxe.Component
     var jump_counter : Int = 0;
     var jump_timer : Float = 0;
 
-    public function new(_physics: PhysicsEngine2D, ?_options: luxe.options.ComponentOptions = null)
+    public function new(_physics: PhysicsEngine2D, _shape: Shape, ?_options: luxe.options.ComponentOptions = null)
     {
         if (_options == null)
         {
@@ -39,6 +41,7 @@ class Physics2DBody extends luxe.Component
         super(_options);
 
         body = new Physics2DRigidBody();
+        body.collider = _shape;
         physics = _physics;
     }
 

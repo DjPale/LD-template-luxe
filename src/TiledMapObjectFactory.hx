@@ -22,7 +22,8 @@ class TiledMapObjectFactory
 
         prefabs = new PrefabManager();
         var prefab_res = Luxe.resources.json(_prefab_id);
-        prefabs.load_from_resouce(prefab_res);
+        trace("res=" + prefab_res);
+        prefabs.load_from_resource(prefab_res);
 
         prefabs.register_var("physics2d", physics2d);
         prefabs.register_var("map", map);
@@ -100,28 +101,42 @@ class TiledMapObjectFactory
 
             var entity = null;
 
+            prefabs.register_var("$shape", shape);
+
             if (prefabs.has_prefab(obj.type))
             {
-                prefabs.register_var("$shape", shape);
+                trace('trying to create ${obj.name} from prefab ${obj.type}');
 
                 entity = prefabs.instantiate(obj.type);
-                entity.pos.copy_from(obj.pos);
-                entity.name = obj.name;
 
-                prefabs.register_var("$shape", null);
+                if (entity != null)
+                {
+                    entity.pos.copy_from(obj.pos);
+                    entity.name = obj.name;
+                }
             }
             else
             {
+                trace('trying to create pure ${obj.name} from class ${obj.type}');
+
                 entity = ReflectionHelper.try_instantiate(obj.type);
+            }
+
+            if (entity == null)
+            {
+                trace('warning! could not create obj id ${obj.id}');
             }
 
             // apply any tiled-specific properties in the same styles as prefabs
             // ie. '[component.]key = value'
             if (entity != null && obj.properties != null)
             {
+                trace('trying to set props for entity ${entity.name}');
                 var props = PrefabManager.get_properties_with_components(obj.properties);
-                PrefabManager.apply_properties_with_components(entity, props);
+                prefabs.apply_properties_with_components(entity, props, true);
             }
+
+            prefabs.register_var("$shape", null);
         }
     }
 

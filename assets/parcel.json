@@ -1,12 +1,14 @@
 {
     "textures" : [
         { "id" : "assets/tiles.png" },
+        { "id" : "assets/tiles_n.png" },
         { "id" : "assets/gradient.png" }
     ],
     "text" : [
         { "id" : "assets/testmap.tmx" }
     ],
     "shaders" : [
+        { "id" : "nmaplit", "vert_id" : "default", "frag_id" : "assets/frag.nmaplit.glsl" }
     ],
     "json" : [
         { "id" : "assets/prefabs.json" }

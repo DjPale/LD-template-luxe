@@ -3,6 +3,7 @@ package util;
 import luxe.collision.shapes.Shape;
 import luxe.collision.shapes.Polygon;
 import luxe.importers.tiled.TiledObjectGroup;
+import luxe.importers.tiled.TiledMap;
 
 class TiledMapHelper
 {
@@ -38,5 +39,27 @@ class TiledMapHelper
         }
 
         return ret;
+    }
+
+    public static function apply_tile_shader(map: TiledMap, shader: phoenix.Shader)
+    {
+        if (map.visual == null) return;
+
+        var layers = map.visual.geometry.keys();
+
+        for (lname in layers)
+        {
+            for (row in map.visual.geometry[lname])
+            {
+                for (geom in row)
+                {
+                    if (geom != null)
+                    {
+                        geom.shader = shader;
+                        trace(geom.shader);
+                    }
+                }
+            }
+        }
     }
 }

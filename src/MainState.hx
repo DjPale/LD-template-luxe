@@ -18,8 +18,10 @@ import physics2d.components.Physics2DBody;
 
 import util.DebugWatcher;
 import util.DebugWindow;
+import util.TiledMapHelper;
 
 import phoenix.Batcher;
+import phoenix.Shader;
 
 import Main;
 
@@ -37,6 +39,7 @@ class MainState extends State
     var factory : TiledMapObjectFactory;
     var light_batcher : Batcher;
     var light: Sprite;
+    var nmapshader : Shader;
 
 
     var map : TiledMap;
@@ -61,6 +64,11 @@ class MainState extends State
     override function onmousemove(event: luxe.MouseEvent)
     {
         light.pos.copy_from(Luxe.camera.screen_point_to_world(event.pos));
+
+        if (nmapshader != null)
+        {
+            nmapshader.set_vector3('lightPos', new Vector(event.pos.x / Luxe.screen.width, event.pos.y / Luxe.screen.h, 0.75));
+        }
     }
 
 
@@ -101,6 +109,15 @@ class MainState extends State
         map.display({
             scale: map_scale
         });
+
+        var nmap_tex = Luxe.resources.texture('assets/tiles_n.png');
+        nmap_tex.slot = 1;
+        nmapshader = Luxe.resources.shader('nmaplit');
+        nmapshader.set_texture('tex1', nmap_tex);
+        nmapshader.set_vector2('resolution', Luxe.screen.size);
+        TiledMapHelper.apply_tile_shader(map, nmapshader);
+
+        //Actuate.timer(1).onComplete(function() { TiledMapHelper.apply_tile_shader(map, nmapshader); });
 
         physics2d.gravity.set_xy(0, 10);
         physics2d.draw = true;

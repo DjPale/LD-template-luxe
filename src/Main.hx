@@ -27,6 +27,14 @@ class Main extends luxe.Game
 
     function setup()
     {
+        trace(Luxe.screen.size);
+
+        var ratio = Luxe.screen.device_pixel_ratio;
+        trace(ratio);
+
+        var vp_size = Luxe.screen.size.divideScalar(ratio);
+        Luxe.camera.size = vp_size;
+
         global.ui = Luxe.renderer.create_batcher({
             name: 'ui',
             layer: 1
@@ -39,7 +47,6 @@ class Main extends luxe.Game
         global.states.add(new MainState(global, Luxe.renderer.batcher));
         global.states.set('MainState');
 
-        trace(Luxe.screen.size);
     }
 
     function setup_canvas()

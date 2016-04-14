@@ -24,6 +24,8 @@ class PhysicsEngine2D extends luxe.Physics.PhysicsEngine
 
     var drawer : luxe.collision.ShapeDrawerLuxe;
 
+    public var tile_bounding : Vector = new Vector(200, 200);
+
     public static var LAYER_STATIC : Int = 1;
     public static var LAYER_DEFAULT : Int = 2;
     public static var MAX_LAYERS : Int = 8;
@@ -200,9 +202,10 @@ class PhysicsEngine2D extends luxe.Physics.PhysicsEngine
         for (l in layers)
         {
             var scale = l.layer.map.visual.options.scale;
-            var top_left = l.layer.map.worldpos_to_map(b.collider.position, scale);
+            var top_left = l.layer.map.tile_coord(b.collider.position.x, b.collider.position.y, scale);
             //TODO: calculate shape bounding box
-            var bottom_right = l.layer.map.worldpos_to_map(Vector.Add(b.collider.position,new Vector(200,200)), scale);
+            var bottom_ofs = Vector.Add(b.collider.position, tile_bounding);
+            var bottom_right = l.layer.map.tile_coord(bottom_ofs.x, bottom_ofs.y, scale);
 
             for (x in Std.int(top_left.x-1)...Std.int(bottom_right.x))
             {
@@ -211,7 +214,7 @@ class PhysicsEngine2D extends luxe.Physics.PhysicsEngine
                     var t = l.layer.map.tile_at(l.layer.name, x, y);
                     if (t != null && t.id != 0)
                     {
-                        l.collider.position = l.layer.map.tile_pos(l.layer.name, x, y, scale);
+                        l.collider.position = l.layer.map.tile_pos(x, y, scale);
 
                         if (Collision.shapeWithShape(b.collider, l.collider) != null)
                         {

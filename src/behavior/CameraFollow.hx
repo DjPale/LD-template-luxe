@@ -11,12 +11,14 @@ class CameraFollow extends Component
     public var bounds : Rectangle;
 
     var cam : Camera;
+    var pos_offset : Vector = new Vector();
 
     public function new(?_options: luxe.options.ComponentOptions = null)
     {
         super(_options);
 
         bounds = new Rectangle(0, 0, Luxe.screen.w, Luxe.screen.h);
+        recalc_offset();
     }
 
     override function init()
@@ -24,15 +26,35 @@ class CameraFollow extends Component
         cam = cast entity;
     }
 
+    function recalc_offset()
+    {
+        var ratio = Luxe.screen.device_pixel_ratio;
+        if (ratio == 1) return;
+
+        pos_offset = Luxe.screen.size.divideScalar(ratio);
+        pos_offset.divideScalar(2.0);
+        pos_offset.multiplyScalar(-1);
+        trace(pos_offset);
+    }
+
+    override function onwindowsized(e: luxe.Screen.WindowEvent)
+    {
+        recalc_offset();
+    }
+
     override function update(dt: Float)
     {
         if (cam == null || target == null) return;
 
-        cam.pos.set_xy(target.x - cam.viewport.w / 2, target.y - cam.viewport.h / 2);
+        var cpos = target.clone();
+        cpos.subtract_xyz(cam.size.x / 2, cam.size.y / 2);
+        cpos.add(pos_offset);
 
-        if (cam.pos.x < bounds.x) cam.pos.x = bounds.x;
-        if (cam.pos.y < bounds.y) cam.pos.y = bounds.y;
-        if (cam.pos.x > bounds.x + bounds.w) cam.pos.x = bounds.x + bounds.w;
-        if (cam.pos.y > bounds.y + bounds.h) cam.pos.y = bounds.y + bounds.h;
+        cam.pos.copy_from(cpos);
+
+        if (cpos.x < bounds.x + pos_offset.x) cam.pos.x = bounds.x + pos_offset.x;
+        if (cpos.y < bounds.y + pos_offset.y) cam.pos.y = bounds.y + pos_offset.y;
+        if (cpos.x > bounds.x + pos_offset.x + bounds.w) cam.pos.x = bounds.x + pos_offset.x + bounds.w;
+        if (pos_offset.y > bounds.y + pos_offset.y + bounds.h) cam.pos.y = bounds.y + pos_offset.y + bounds.h;
     }
 }

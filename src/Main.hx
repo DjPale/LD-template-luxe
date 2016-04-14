@@ -37,7 +37,7 @@ class Main extends luxe.Game
 
         global.ui = Luxe.renderer.create_batcher({
             name: 'ui',
-            layer: 1
+            layer: 3
         });
 
         setup_canvas();

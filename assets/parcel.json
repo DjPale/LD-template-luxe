@@ -1,6 +1,7 @@
 {
     "textures" : [
-        { "id" : "assets/tiles.png" }
+        { "id" : "assets/tiles.png" },
+        { "id" : "assets/gradient.png" }
     ],
     "text" : [
         { "id" : "assets/testmap.tmx" }

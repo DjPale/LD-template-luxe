@@ -2,6 +2,11 @@ import luxe.States;
 import luxe.Mesh;
 import luxe.Text;
 import luxe.Vector;
+import luxe.Input;
+import luxe.Sprite;
+
+import luxe.tween.Actuate;
+import luxe.tween.easing.Sine;
 
 import luxe.collision.shapes.Polygon;
 import luxe.collision.shapes.Circle;
@@ -13,6 +18,8 @@ import physics2d.components.Physics2DBody;
 
 import util.DebugWatcher;
 import util.DebugWindow;
+
+import phoenix.Batcher;
 
 import Main;
 
@@ -28,6 +35,8 @@ class MainState extends State
 
     var dispatcher : MessageDispatcher;
     var factory : TiledMapObjectFactory;
+    var light_batcher : Batcher;
+    var light: Sprite;
 
 
     var map : TiledMap;
@@ -49,9 +58,11 @@ class MainState extends State
         setup();
     }
 
-    override function update(dt:Float)
+    override function onmousemove(event: luxe.MouseEvent)
     {
+        light.pos.copy_from(Luxe.camera.screen_point_to_world(event.pos));
     }
+
 
     function setup()
     {
@@ -65,6 +76,25 @@ class MainState extends State
             tiled_file_data: map_data.asset.text,
             format: 'tmx'
         });
+
+        light_batcher = Luxe.renderer.create_batcher({
+            name: 'light_batcher',
+            camera: Luxe.camera.view,
+            layer: 2
+        });
+
+        light = new Sprite({
+            name: 'light',
+            batcher: light_batcher,
+            texture: Luxe.resources.texture('assets/gradient.png'),
+            color: new luxe.Color().rgb(0xFFD700)
+            //scale: new Vector(2, 2)
+        });
+
+        Actuate.tween(light.scale, 1.0, { x: 2, y: 2 }).reflect().repeat().ease(Sine.easeInOut);
+
+        light_batcher.on(prerender, function(b:Batcher){ Luxe.renderer.blend_mode(BlendMode.src_alpha, BlendMode.one); });
+        light_batcher.on(postrender, function(b:Batcher){ Luxe.renderer.blend_mode(); });
 
         factory = new TiledMapObjectFactory('assets/prefabs.json', map, physics2d);
 

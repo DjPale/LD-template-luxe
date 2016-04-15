@@ -30,10 +30,17 @@ class Main extends luxe.Game
         trace(Luxe.screen.size);
 
         var ratio = Luxe.screen.device_pixel_ratio;
-        trace(ratio);
+        trace('device ratio = $ratio');
 
-        var vp_size = Luxe.screen.size.divideScalar(ratio);
-        Luxe.camera.size = vp_size;
+        if (ratio >= 2)
+        {
+            var vp_size = Luxe.screen.size.divideScalar(ratio);
+            Luxe.camera.size = vp_size;
+        }
+        else
+        {
+            Luxe.camera.size = Luxe.screen.size;
+        }
 
         global.ui = Luxe.renderer.create_batcher({
             name: 'ui',

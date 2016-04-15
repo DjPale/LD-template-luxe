@@ -29,7 +29,7 @@ class CameraFollow extends Component
     function recalc_offset()
     {
         var ratio = Luxe.screen.device_pixel_ratio;
-        if (ratio == 1) return;
+        if (ratio < 2) return;
 
         pos_offset = Luxe.screen.size.divideScalar(ratio);
         pos_offset.divideScalar(2.0);

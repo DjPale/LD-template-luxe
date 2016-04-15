@@ -9,6 +9,8 @@ import util.ReflectionHelper;
 import util.PrefabManager;
 import util.TiledMapHelper;
 
+import scripting.luxe.ScriptComponent;
+
 class TiledMapObjectFactory
 {
     var map: TiledMap;
@@ -27,6 +29,9 @@ class TiledMapObjectFactory
 
         prefabs.register_var("physics2d", physics2d);
         prefabs.register_var("map", map);
+
+        // temp workaround to be sure that we have classes we need when loading dynamically
+        new ScriptClassLibraryCustom();
     }
 
     public function register_tile_collision_layer(name: String)
@@ -108,12 +113,6 @@ class TiledMapObjectFactory
                 trace('trying to create ${obj.name} from prefab ${obj.type}');
 
                 entity = prefabs.instantiate(obj.type);
-
-                if (entity != null)
-                {
-                    entity.pos.copy_from(obj.pos);
-                    entity.name = obj.name;
-                }
             }
             else
             {
@@ -127,6 +126,13 @@ class TiledMapObjectFactory
                 trace('warning! could not create obj id ${obj.id}');
             }
 
+
+            if (entity != null)
+            {
+                entity.pos.copy_from(obj.pos);
+                entity.name = obj.name;
+            }
+
             // apply any tiled-specific properties in the same styles as prefabs
             // ie. '[component.]key = value'
             if (entity != null && obj.properties != null)
@@ -134,6 +140,17 @@ class TiledMapObjectFactory
                 trace('trying to set props for entity ${entity.name}');
                 var props = PrefabManager.get_properties_with_components(obj.properties);
                 prefabs.apply_properties_with_components(entity, props, true);
+
+                var script_comp : ScriptComponent = entity.get("ScriptManager");
+
+                if (script_comp != null)
+                {
+                    var script_mgr = script_comp.manager;
+
+                    script_mgr.register_variable('map', map);
+                    script_mgr.register_variable('physics2d', physics2d);
+                    script_mgr.register_variable('prefabs', prefabs);
+                }
             }
 
             prefabs.register_var("$shape", null);

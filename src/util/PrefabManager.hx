@@ -12,6 +12,7 @@ typedef PrefabComponent = {
 typedef Prefab = {
     name: String,
     base: String,
+    classname: String,
     properties: Map<String, Map<String,String>>,
     components: Array<String>
 };
@@ -54,8 +55,9 @@ class PrefabManager
 
         for (prefab in it_prefabs)
         {
-            var p : Prefab = { name: prefab.name, base: prefab.base, properties: null, components: null };
+            var p : Prefab = { name: prefab.name, base: prefab.base, classname: prefab.classname, properties: null, components: null };
             prefabs.set(p.name, p);
+            if (p.classname == null) p.classname = "Entity";
 
             var tmp_props = ReflectionHelper.json_to_properties(prefab.properties);
 
@@ -127,7 +129,17 @@ class PrefabManager
 
         for (a in clist)
         {
-            ret.push(var_list.get(a));
+            if (a.length <= 0) continue;
+
+            // string literal
+            if (a.charAt(0) == "@")
+            {
+                ret.push(a.substr(1));
+            }
+            else
+            {
+                ret.push(var_list.get(a));
+            }
         }
 
         return ret;
@@ -140,6 +152,9 @@ class PrefabManager
         if (pfcomp == null) return null;
 
         var cl = Type.resolveClass(pfcomp.name);
+
+        if (cl == null) return null;
+
         var constr = build_constructor(pfcomp.constructor);
         return Type.createInstance(cl, constr);
     }
@@ -158,7 +173,7 @@ class PrefabManager
         }
         else
         {
-            ret = Type.createInstance(Entity, []);
+            ret = ReflectionHelper.try_instantiate(prefab.classname);
         }
 
         if (ret == null) return ret;

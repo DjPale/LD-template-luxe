@@ -16,13 +16,17 @@
     app : {
       name : 'LD-template-2016',
       package : 'com.digitalapathy',
+      codepaths : ['src', 'assets/scripts']
     },
 
     build : {
       dependencies : {
         luxe : '*',
-        mint : '*'
-      }
+        mint : '*',
+        hscript : '*'
+      },
+      defines : ['hscriptPos'],
+      flags: ['-dce std']
     },
 
     files : {

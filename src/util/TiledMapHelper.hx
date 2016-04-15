@@ -56,7 +56,7 @@ class TiledMapHelper
                     if (geom != null)
                     {
                         geom.shader = shader;
-                        trace(geom.shader);
+                        //trace(geom.shader);
                     }
                 }
             }

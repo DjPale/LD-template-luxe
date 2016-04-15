@@ -10,13 +10,19 @@
         },
         {
             "name" : "behavior.components.DamageInteractor"
+        },
+        {
+            "name" : "scripting.luxe.ScriptComponent",
+            "constructor" : ["@assets/scripts/EnemyScript.hx"]
         }
     ],
     "prefabs" : [
         {
             "name" : "Enemy",
+            "classname" : "BasicEnemy",
             "components" : [
-                "Physics2DBody"
+                "Physics2DBody",
+                "ScriptComponent"
             ],
             "properties" :
                 {

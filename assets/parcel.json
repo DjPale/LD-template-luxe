@@ -5,7 +5,8 @@
         { "id" : "assets/gradient.png" }
     ],
     "text" : [
-        { "id" : "assets/testmap.tmx" }
+        { "id" : "assets/testmap.tmx" },
+        { "id" : "assets/scripts/EnemyScript.hx" }
     ],
     "shaders" : [
         { "id" : "nmaplit", "vert_id" : "default", "frag_id" : "assets/frag.nmaplit.glsl" }

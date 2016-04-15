@@ -26,7 +26,7 @@ class ScriptComponent extends Component
         manager = new ScriptManager();
 		manager.register_variable('Luxe', Luxe);
 
-        _script = script;
+        _script = Luxe.resources.text(script).asset.text;
 	}
 
 	override function init()

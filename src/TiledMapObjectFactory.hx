@@ -9,7 +9,7 @@ import util.ReflectionHelper;
 import util.PrefabManager;
 import util.TiledMapHelper;
 
-import scripting.ScriptManager;
+import scripting.luxe.ScriptComponent;
 
 class TiledMapObjectFactory
 {
@@ -141,10 +141,12 @@ class TiledMapObjectFactory
                 var props = PrefabManager.get_properties_with_components(obj.properties);
                 prefabs.apply_properties_with_components(entity, props, true);
 
-                var script_mgr : ScriptManager = entity.get("ScriptManager");
+                var script_comp : ScriptComponent = entity.get("ScriptManager");
 
-                if (script_mgr != null)
+                if (script_comp != null)
                 {
+                    var script_mgr = script_comp.manager;
+
                     script_mgr.register_variable('map', map);
                     script_mgr.register_variable('physics2d', physics2d);
                     script_mgr.register_variable('prefabs', prefabs);

@@ -1,20 +1,40 @@
 {
-    "idle": {
+    "attack_default": {
         "frame_size": { "x":"32", "y":"32" },
-        "frameset": ["1"],
-        "loop": "true",
-        "speed": "3"
+        "frameset": ["1"]
     },
-    "turn_left": {
+    "attack_left": {
         "frame_size": { "x":"32", "y":"32" },
-        "frameset": ["2"],
-        "loop": "true",
-        "speed": "3"
+        "frameset": ["2"]
     },
-    "turn_right": {
+    "attack_right": {
         "frame_size": { "x":"32", "y":"32" },
-        "frameset": ["3"],
-        "loop": "true",
-        "speed": "3"
+        "frameset": ["3"]
+    },
+
+    "defence_default": {
+        "frame_size": { "x":"32", "y":"32" },
+        "frameset": ["4"]
+    },
+    "defence_left": {
+        "frame_size": { "x":"32", "y":"32" },
+        "frameset": ["5"]
+    },
+    "defence_right": {
+        "frame_size": { "x":"32", "y":"32" },
+        "frameset": ["6"]
+    },
+
+    "speed_default": {
+        "frame_size": { "x":"32", "y":"32" },
+        "frameset": ["7"]
+    },
+    "speed_left": {
+        "frame_size": { "x":"32", "y":"32" },
+        "frameset": ["8"]
+    },
+    "speed_right": {
+        "frame_size": { "x":"32", "y":"32" },
+        "frameset": ["9"]
     }
 }

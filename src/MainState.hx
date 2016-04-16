@@ -141,6 +141,11 @@ class MainState extends State
             texture: image
         });
 
+        var animation = player.add(new SpriteAnimation({ name: 'anim' }));
+        animation.add_from_json_object(Luxe.resources.json('assets/player_anim.json').asset.json);
+        animation.animation = 'idle';
+        animation.play();
+
         phys = player.add(new Physics2DBody(physics2d, Polygon.rectangle(100, 200, 16, 16, true), { name: 'Physics2DBody' }));
         player.pos.copy_from(phys.body.collider.position);
 
@@ -152,7 +157,6 @@ class MainState extends State
         animation.animation = 'idle';
         animation.play();
 
-        var weapon = player.add(new Weapon(physics2d, phys, { name: 'Weapon' }));
         weapon.bullet_layer = LAYER_PLAYER_BULLET;
 
         var dmg_recv = player.add(new DamageReceiver({ name: 'DamageReceiver' }));

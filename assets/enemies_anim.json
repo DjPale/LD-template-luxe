@@ -1,0 +1,14 @@
+{
+    "enemy_attack": {
+        "frame_size": { "x":"16", "y":"16" },
+        "frameset": ["6"]
+    },
+    "enemy_defense": {
+        "frame_size": { "x":"16", "y":"16" },
+        "frameset": ["2"]
+    },
+    "enemy_speed": {
+        "frame_size": { "x":"16", "y":"16" },
+        "frameset": ["1"]
+    }
+}

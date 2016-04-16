@@ -4,11 +4,14 @@ import luxe.Entity;
 
 import luxe.collision.shapes.Polygon;
 import luxe.collision.shapes.Circle;
+import luxe.components.sprite.SpriteAnimation;
 
 import physics2d.PhysicsEngine2D;
 import physics2d.components.Physics2DBody;
 
 import behavior.DamageReceiver;
+
+import phoenix.Texture;
 
 class EnemySpawner
 {
@@ -96,10 +99,14 @@ class EnemySpawner
 
     public function spawn_enemy(spos: Vector, ?_type : Int = -1) : Sprite
     {
+        var image = Luxe.resources.texture('assets/gfx/enemies.png');
+            image.filter_min = image.filter_mag = FilterType.nearest;
+
         var sprite = new Sprite({
             name: 'enemy',
             name_unique: true,
-            size: new Vector(base_size, base_size)
+            size: new Vector(base_size, base_size),
+            texture: image
         });
 
         var phys = sprite.add(new Physics2DBody(
@@ -133,6 +140,19 @@ class EnemySpawner
         {
             be.cap_type = _type;
         }
+
+        trace('be.cap_type: ' + be.cap_type);
+        var animation = sprite.add(new SpriteAnimation({ name: 'anim' }));
+        animation.add_from_json_object(Luxe.resources.json('assets/enemies_anim.json').asset.json);
+        if (be.cap_type == 0) {
+            animation.animation = 'enemy_attack';
+        } else if (be.cap_type == 1) {
+            animation.animation = 'enemy_defense';
+        } else {
+            animation.animation = 'enemy_speed';
+        }
+
+        animation.play();
 
         sprite.add(be);
 

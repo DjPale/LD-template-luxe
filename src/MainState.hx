@@ -101,8 +101,8 @@ class MainState extends State
         physics2d.set_layer_collision(LAYER_PLAYER_BULLET, LAYER_PLAYER_BULLET, false);
 
         physics2d.set_layer_collision(LAYER_ENEMY, LAYER_ENEMY_BULLET, false);
+        physics2d.set_layer_collision(LAYER_ENEMY, LAYER_ENEMY, false);
         physics2d.set_layer_collision(LAYER_ENEMY_BULLET, LAYER_ENEMY_BULLET, false);
-
 
         ShapeCapabilities.templates.push({
             attack: 2,

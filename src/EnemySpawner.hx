@@ -74,7 +74,7 @@ class EnemySpawner
         dmg_recv.hitpoints = 2;
         sprite.add(dmg_recv);
 
-        var weapon = sprite.add(new Weapon(physics2d, { name: 'Weapon' }));
+        var weapon = sprite.add(new Weapon(physics2d, phys, { name: 'Weapon' }));
         weapon.bullet_layer = bullet_layer;
         weapon.fire_rate = 2;
         weapon.bullet_speed = 100;

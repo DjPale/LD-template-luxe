@@ -22,12 +22,14 @@ class Weapon extends Component
     var fire_rate_cnt : Float = 0;
 
     var physics2d : PhysicsEngine2D;
+    var phys : Physics2DBody;
 
-    public function new(_physics2d: PhysicsEngine2D, ?_options: luxe.options.ComponentOptions)
+    public function new(_physics2d: PhysicsEngine2D, _phys: Physics2DBody, ?_options: luxe.options.ComponentOptions)
     {
         super(_options);
 
         physics2d = _physics2d;
+        phys = _phys;
     }
 
     override function update(dt: Float)
@@ -60,7 +62,10 @@ class Weapon extends Component
         bullet_phys.body.collision_response = false;
         bullet_phys.body.layer = bullet_layer;
         direction.normalize();
+
         bullet_phys.move_speed.set_xy(direction.x * bullet_speed, direction.y * bullet_speed);
+        bullet_phys.move_speed.add(phys.body.velocity);
+
         bullet_phys.body.apply_velocity(bullet_phys.move_speed.x, bullet_phys.move_speed.y);
 
         var bul_dmg = bullet.add(new DamageDealer({ name: 'DamageDealer' }));

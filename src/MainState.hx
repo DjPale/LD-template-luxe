@@ -10,6 +10,7 @@ import luxe.tween.easing.Sine;
 
 import luxe.collision.shapes.Polygon;
 import luxe.collision.shapes.Circle;
+import luxe.components.sprite.SpriteAnimation;
 import luxe.importers.tiled.TiledMap;
 
 import physics2d.PhysicsEngine2D;
@@ -25,6 +26,7 @@ import behavior.DamageReceiver;
 
 import phoenix.Batcher;
 import phoenix.Shader;
+import phoenix.Texture;
 
 import Main;
 
@@ -127,9 +129,13 @@ class MainState extends State
 
     function setup_player()
     {
+        var image = Luxe.resources.texture('assets/gfx/player.png');
+            image.filter_min = image.filter_mag = FilterType.nearest;
+
         player = new luxe.Sprite({
             name: 'player',
-            size: new Vector(32, 32)
+            size: new Vector(32, 32),
+            texture: image
         });
 
         phys = player.add(new Physics2DBody(physics2d, Polygon.rectangle(100, 200, 32, 32, true), { name: 'Physics2DBody' }));

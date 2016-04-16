@@ -1,8 +1,8 @@
 {
     "textures" : [
-        { "id" : "assets/tiles.png" },
-        { "id" : "assets/tiles_n.png" },
-        { "id" : "assets/gradient.png" }
+        { "id" : "assets/gfx/player.png" },
+        { "id" : "assets/gfx/enemies.png" },
+        { "id" : "assets/gfx/ui.png" }
     ],
     "text" : [
         { "id" : "assets/testmap.tmx" },

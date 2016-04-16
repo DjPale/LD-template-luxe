@@ -139,6 +139,8 @@ class MainState extends State
         phys.body.collision_response = false;
 
         var weapon = player.add(new Weapon(physics2d, { name: 'Weapon' }));
+        weapon.bullet_layer = LAYER_PLAYER_BULLET;
+
         var dmg_recv = player.add(new DamageReceiver({ name: 'DamageReceiver' }));
 
         player_cap = player.add(new ShapeCapabilities(weapon, phys, dmg_recv, { name: 'ShapeCapabilities' }));

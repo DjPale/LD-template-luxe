@@ -35,12 +35,17 @@ class BasicEnemy extends Component
 
         cap.apply_abilities(cap_type);
 
-        //phys.move(0, 1);
+        phys.move(0, 1);
     }
 
     override function update(dt: Float)
     {
         ai_step(dt);
+
+        if (entity.pos.y > Luxe.camera.size.y)
+        {
+            entity.destroy();
+        }
     }
 
     override function ondestroy()

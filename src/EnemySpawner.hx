@@ -16,6 +16,9 @@ class EnemySpawner
     public var base_size : Float = 32;
     public var enemy_layer : Int = PhysicsEngine2D.LAYER_DEFAULT;
     public var bullet_layer : Int = PhysicsEngine2D.LAYER_DEFAULT;
+    public var spawn_interval : Float = 5;
+
+    var spawn_interval_cnt : Float = 0;
 
     var physics2d : PhysicsEngine2D;
     var player : Entity;

@@ -30,6 +30,29 @@ class EnemySpawner
         player = _player;
     }
 
+    public function update(dt: Float)
+    {
+        if (spawn_interval_cnt > 0)
+        {
+            spawn_interval_cnt -= dt;
+
+            if (spawn_interval_cnt <= 0)
+            {
+                spawn_mark();
+            }
+        }
+    }
+
+    public function spawn_mark()
+    {
+        for (i in 0...6)
+        {
+            spawn_enemy(new Vector(10 + i*(base_size + 8),-base_size));
+        }
+
+        spawn_interval_cnt = spawn_interval;
+    }
+
     public function spawn_enemy(spos: Vector) : Sprite
     {
         var sprite = new Sprite({

@@ -12,6 +12,7 @@
         { "id" : "nmaplit", "vert_id" : "default", "frag_id" : "assets/frag.nmaplit.glsl" }
     ],
     "json" : [
-        { "id" : "assets/prefabs.json" }
+        { "id" : "assets/prefabs.json" },
+        { "id": "assets/player_anim.json" }
     ]
 }

@@ -17,6 +17,8 @@ class PlayerInput extends luxe.Component
     var weapon: Weapon;
     var animation: SpriteAnimation;
 
+    var player_state = 'attack';
+
     public function new(_phys: Physics2DBody, _cap: ShapeCapabilities, _weapon: Weapon, _animation: SpriteAnimation, ?_options: luxe.options.ComponentOptions)
     {
         super(_options);
@@ -60,6 +62,8 @@ class PlayerInput extends luxe.Component
     {
         var x = 0;
         var y = 0;
+        var player_direction = 'default';
+
 
         if (Luxe.input.inputdown("fire"))
         {
@@ -69,24 +73,32 @@ class PlayerInput extends luxe.Component
         if (Luxe.input.inputdown("chg_attack"))
         {
             change_shape(0);
+            player_state = 'attack';
         }
         else if (Luxe.input.inputdown("chg_defense"))
         {
             change_shape(1);
+            player_state = 'defence';
         }
         else if (Luxe.input.inputdown("chg_speed"))
         {
             change_shape(2);
+            player_state = 'speed';
         }
 
         if (Luxe.input.inputdown("left"))
         {
             x = -1;
+            player_direction = 'left';
         }
         else if (Luxe.input.inputdown("right"))
         {
             x = 1;
+            player_direction = 'right';
+        } else {
+            player_direction = 'default';
         }
+
 
         if (Luxe.input.inputdown("up"))
         {
@@ -97,14 +109,7 @@ class PlayerInput extends luxe.Component
             y = 1;
         }
 
-        if (x > 0) {
-            animation.animation = 'turn_right';
-        } else if (x < 0) {
-            animation.animation = 'turn_left';
-        } else {
-            animation.animation = 'idle';
-        }
-
+        animation.animation = player_state + '_' + player_direction;
         animation.play();
 
         phys.move(x, y);

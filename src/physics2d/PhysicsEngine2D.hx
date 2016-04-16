@@ -91,6 +91,7 @@ class PhysicsEngine2D extends luxe.Physics.PhysicsEngine
 
     public function remove_body(body: Physics2DRigidBody)
     {
+        body.engine = null;
         bodies.remove(body);
     }
 
@@ -125,7 +126,7 @@ class PhysicsEngine2D extends luxe.Physics.PhysicsEngine
 
     public function add_trigger(shape: Shape) : Physics2DRigidBody
     {
-        var ret = new Physics2DRigidBody();
+        var ret = new Physics2DRigidBody(this);
         ret.damp = new Vector();
         ret.is_trigger = true;
         ret.collider = shape;

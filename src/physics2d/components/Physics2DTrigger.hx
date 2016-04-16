@@ -58,7 +58,7 @@ class Physics2DTrigger extends luxe.Component
         if (body != null && body.collider != null) this.pos.copy_from(body.collider.position);
     }
 
-    override public function onremoved()
+    override public function ondestroy()
     {
         physics.remove_body(body);
     }

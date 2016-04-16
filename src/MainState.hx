@@ -20,6 +20,9 @@ import util.DebugWatcher;
 import util.DebugWindow;
 import util.TiledMapHelper;
 
+import behavior.DamageDealer;
+import behavior.DamageReceiver;
+
 import phoenix.Batcher;
 import phoenix.Shader;
 
@@ -33,16 +36,14 @@ class MainState extends State
     var watcher: DebugWatcher;
 
     var phys : Physics2DBody;
-    var trigger : Physics2DRigidBody;
+    var player_inp : PlayerInput;
+    var player_cap : ShapeCapabilities;
 
     var dispatcher : MessageDispatcher;
     var factory : TiledMapObjectFactory;
     var light_batcher : Batcher;
-    var light: Sprite;
-    var nmapshader : Shader;
 
-
-    var map : TiledMap;
+    var spawner : EnemySpawner;
 
     public function new(_global:GlobalData, _batcher:phoenix.Batcher)
     {
@@ -63,12 +64,6 @@ class MainState extends State
 
     override function onmousemove(event: luxe.MouseEvent)
     {
-        light.pos.copy_from(Luxe.camera.screen_point_to_world(event.pos));
-
-        if (nmapshader != null)
-        {
-            nmapshader.set_vector3('lightPos', new Vector(event.pos.x / Luxe.screen.width, event.pos.y / Luxe.screen.h, 0.75));
-        }
     }
 
 
@@ -76,93 +71,66 @@ class MainState extends State
     {
         watcher = new DebugWatcher();
 
-        var map_data = Luxe.resources.text('assets/testmap.tmx');
+        // light_batcher = Luxe.renderer.create_batcher({
+        //     name: 'light_batcher',
+        //     camera: Luxe.camera.view,
+        //     layer: 2
+        // });
+        //
+        //
+        // light_batcher.on(prerender, function(b:Batcher){ Luxe.renderer.blend_mode(BlendMode.src_alpha, BlendMode.one); });
+        // light_batcher.on(postrender, function(b:Batcher){ Luxe.renderer.blend_mode(); });
 
-        var map_scale = 2.0;
-
-        map = new TiledMap({
-            tiled_file_data: map_data.asset.text,
-            format: 'tmx'
-        });
-
-        light_batcher = Luxe.renderer.create_batcher({
-            name: 'light_batcher',
-            camera: Luxe.camera.view,
-            layer: 2
-        });
-
-        light = new Sprite({
-            name: 'light',
-            batcher: light_batcher,
-            texture: Luxe.resources.texture('assets/gradient.png'),
-            color: new luxe.Color().rgb(0xFFD700)
-            //scale: new Vector(2, 2)
-        });
-
-        Actuate.tween(light.scale, 1.0, { x: 2, y: 2 }).reflect().repeat().ease(Sine.easeInOut);
-
-        light_batcher.on(prerender, function(b:Batcher){ Luxe.renderer.blend_mode(BlendMode.src_alpha, BlendMode.one); });
-        light_batcher.on(postrender, function(b:Batcher){ Luxe.renderer.blend_mode(); });
-
-        factory = new TiledMapObjectFactory('assets/prefabs.json', map, physics2d);
-
-        map.display({
-            scale: map_scale
-        });
-
-        var nmap_tex = Luxe.resources.texture('assets/tiles_n.png');
-        nmap_tex.slot = 1;
-        nmapshader = Luxe.resources.shader('nmaplit');
-        nmapshader.set_texture('tex1', nmap_tex);
-        nmapshader.set_vector2('resolution', Luxe.screen.size);
-        TiledMapHelper.apply_tile_shader(map, nmapshader);
-
-        //Actuate.timer(1).onComplete(function() { TiledMapHelper.apply_tile_shader(map, nmapshader); });
-
-        physics2d.gravity.set_xy(0, 10);
+        physics2d.gravity.set_xy(0, 0);
         physics2d.draw = true;
         physics2d.paused = false;
 
-        factory.register_tile_collision_layer('Solids');
-        factory.register_object_collision_layer('Solid Objects', map_scale);
-        factory.register_trigger_layer('Trigger Objects', map_scale);
-        factory.register_entity_layer('Entity Objects', map_scale);
-
-        var p = new luxe.Entity({
-            name: 'player',
-        });
-
-        phys = p.add(new Physics2DBody(physics2d, Polygon.rectangle(64, 64, 64, 64, true), { name: 'Physics2DBody' }));
-        p.pos.copy_from(phys.body.collider.position);
-
-        phys.set_platformer_configuration(200, 132, 0.5, 0.2, 2, true);
-
-        p.add(new PlayerInput(phys));
-
-        var cam = new behavior.CameraFollow();
-        Luxe.camera.add(cam);
-        cam.target = p.pos;
-        cam.bounds.set(0, 0, 100, 0);
-
-        physics2d.add_obstacle_collision(Polygon.rectangle(0, Luxe.screen.height - 20, Luxe.screen.width, 20, false));
-
-        var db = new Physics2DRigidBody();
-        db.layer = 3;
-        db.collider = Polygon.rectangle(32, 128, 128, 20, true);
         physics2d.set_layer_collision(2, 3, false);
 
-        physics2d.add_body(db);
+        ShapeCapabilities.templates.push({
+            attack: 2,
+            defense: 1,
+            speed: 1,
+        });
+        ShapeCapabilities.templates.push({
+            attack: 1,
+            defense: 2,
+            speed: 1,
+        });
+        ShapeCapabilities.templates.push({
+            attack: 1,
+            defense: 1,
+            speed: 1.5,
+        });
 
-        trigger = physics2d.add_trigger(new Circle(64, 64, 32));
-        trigger.ontrigger = function(_) { trace('trigger enter');  };
+        setup_player();
 
-        physics2d.add_obstacle_collision(Polygon.rectangle(0, Luxe.screen.height - 80, 20, 60, false));
-        physics2d.add_obstacle_collision(Polygon.rectangle(Luxe.screen.width - 20, Luxe.screen.height - 80, 20, 60, false));
-
-        dispatcher = new MessageDispatcher(map);
-        dispatcher.register_triggers();
+        spawner = new EnemySpawner(physics2d);
+        spawner.spawn_enemy(new Vector(100, 100));
+        spawner.spawn_enemy(new Vector(150, 100));
 
         setup_debug();
+    }
+
+    function setup_player()
+    {
+        var p = new luxe.Sprite({
+            name: 'player',
+            size: new Vector(32, 32)
+        });
+
+        phys = p.add(new Physics2DBody(physics2d, Polygon.rectangle(100, 200, 32, 32, true), { name: 'Physics2DBody' }));
+        p.pos.copy_from(phys.body.collider.position);
+
+        phys.set_topdown_configuration(100, 0);
+        phys.body.collision_response = false;
+
+        var dmg_deal = p.add(new DamageDealer({ name: 'DamageDealer' }));
+        var dmg_recv = p.add(new DamageReceiver({ name: 'DamageReceiver' }));
+
+        player_cap = p.add(new ShapeCapabilities(dmg_deal, phys, dmg_recv, { name: 'ShapeCapabilities' }));
+
+        player_inp = p.add(new PlayerInput(phys, player_cap, dmg_deal, { name: 'PlayerInput' }));
     }
 
     function setup_debug()
@@ -180,26 +148,25 @@ class MainState extends State
         win.register_watch(phys.body, 'velocity', 0.1, DebugWatcher.fmt_vec2d);
         win.register_watch(phys, 'move_speed', 1.0, DebugWatcher.fmt_vec2d_f, DebugWatcher.set_vec2d);
         win.register_watch(phys.body, 'damp', 0.2, DebugWatcher.fmt_vec2d_f, DebugWatcher.set_vec2d);
-        win.register_watch(phys.body, 'is_trigger', 0.2, null, DebugWatcher.set_bool);
-        win.register_watch(phys.body, 'collision_response', 0.2, null, DebugWatcher.set_bool);
-        win.register_watch(phys, 'jump_times', 1.0, null, DebugWatcher.set_int);
-        win.register_watch(phys, 'jump_counter', 0.1);
         win.register_watch(phys.body, 'layer', 1.0, null, DebugWatcher.set_int);
-        win.register_watch(phys, 'was_airborne', 0.1);
-        win.register_watch(trigger, 'trigger_list', 0.2, function(v:Dynamic) { return Std.string(v == null ? '<null>' : Lambda.count(v)); } );
+        win.register_watch(player_inp, 'bullet_speed', 1.0, null, DebugWatcher.set_float);
+        win.register_watch(player_cap, 'current_shape', 0.1);
+        win.register_watch(player_inp, 'change_cooldown_cnt', 0.1);
+
 
         var win2 = new DebugWindow(watcher, global.layout, {
             name: 'world-debug',
             title: 'world',
             parent: global.canvas,
-            x: Luxe.screen.w - 256, y: 384, w: 256, h: 128,
+            x: Luxe.screen.w - 256, y: 384, w: 256, h: 256,
             w_min: 256, h_min: 128,
             closable: false, collapsible: true, resizable: true,
         });
 
         win2.register_watch(Luxe.camera, 'pos', 0.1, DebugWatcher.fmt_vec2d);
-        win2.register_watch(physics2d, 'gravity', 1.0, DebugWatcher.fmt_vec2d_f, DebugWatcher.set_vec2d);
         win2.register_watch(physics2d, 'paused', 1.0, null, DebugWatcher.set_bool);
         win2.register_watch(physics2d, 'draw', 1.0, null, DebugWatcher.set_bool);
+        win2.register_watch(physics2d, 'bodies', 0.2, function(v:Dynamic) { return Std.string(v == null ? '<null>' : Lambda.count(v)); } );
+
     }
 }

@@ -1,9 +1,28 @@
-import luxe.Sprite;
+import luxe.Component;
 
-class BasicEnemy extends Sprite
+import behavior.DamageReceiver;
+
+class BasicEnemy extends Component
 {
-    public function new()
+    var dead_msg : String;
+
+    public function new(?_options: luxe.options.ComponentOptions)
     {
-        super({ name: 'BasicEnemy' });
+        super(_options);
+    }
+
+    override function init()
+    {
+        dead_msg = entity.events.listen(DamageReceiver.message, ondead);
+    }
+
+    override function ondestroy()
+    {
+        entity.events.unlisten(dead_msg);
+    }
+
+    function ondead(_)
+    {
+        entity.destroy();
     }
 }

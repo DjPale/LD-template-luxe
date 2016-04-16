@@ -2,11 +2,19 @@
 package physics2d.components;
 
 import luxe.collision.shapes.Shape;
+import luxe.collision.data.ShapeCollision;
 
 import physics2d.PhysicsEngine2D;
 
+import luxe.Entity;
 import luxe.Vector;
 import luxe.utils.Maths;
+
+typedef Physics2DBodyCollisionParams =
+{
+    target: Entity,
+    cdata: ShapeCollision
+};
 
 class Physics2DBody extends luxe.Component
 {
@@ -17,6 +25,8 @@ class Physics2DBody extends luxe.Component
 
     public var jump_times : Int = 1;
     public var jump_pause : Float = 0.05;
+
+    public static var message : String = 'Physics2DBody.collision';
 
     // this is to help the debugger TBH - for some reason shape.position won't play nice
     public var proxy_pos(get,set) : Vector;
@@ -40,14 +50,16 @@ class Physics2DBody extends luxe.Component
 
         super(_options);
 
-        body = new Physics2DRigidBody();
+        body = new Physics2DRigidBody(_physics);
         body.collider = _shape;
+        body.oncollision = oncollision;
         physics = _physics;
     }
 
     override public function init()
     {
         physics.add_body(body);
+        body.data = entity;
     }
 
     override public function update(dt: Float)
@@ -57,8 +69,10 @@ class Physics2DBody extends luxe.Component
         check_state(dt);
     }
 
-    override public function onremoved()
+    override public function ondestroy()
     {
+        body.data = null;
+        body.oncollision = null;
         physics.remove_body(body);
     }
 
@@ -152,6 +166,22 @@ class Physics2DBody extends luxe.Component
         body.damp.y = _damp_factor;
 
         jump_times = 0;
+    }
+
+    function oncollision(target: Physics2DRigidBody, cdata: ShapeCollision)
+    {
+        if (message != null && message.length > 0 && entity != null)
+        {
+            fire_event(message, {target: target.data, cdata: cdata});
+        }
+    }
+
+    // added function to improve type safety check on parameter since it is dynamic for luxe events
+    inline function fire_event(msg: String, e: Physics2DBodyCollisionParams)
+    {
+        if (entity == null) return;
+
+        entity.events.fire(message, e);
     }
 
     // from http://error454.com/2013/10/23/platformer-physics-101-and-the-3-fundamental-equations-of-platformers/

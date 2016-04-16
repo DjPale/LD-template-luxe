@@ -1,4 +1,3 @@
-import BasicEnemy;
 import scripting.luxe.ScriptComponent;
 
 class ScriptClassLibraryCustom

@@ -1,8 +1,8 @@
 {
   luxe : {
     window:{
-      width: 800,
-      height: 600,
+      width: 600,
+      height: 800,
       resizable: false,
       title: 'LD Template Luxe - 2016'
     }

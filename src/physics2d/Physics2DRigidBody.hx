@@ -19,13 +19,16 @@ class Physics2DRigidBody
     public var oncollision : Physics2DCollisionCallback;
     public var ontrigger : Physics2DTriggerCallback;
     public var layer : Int = PhysicsEngine2D.LAYER_DEFAULT;
+    public var engine : PhysicsEngine2D;
+    public var data : Dynamic;
 
     public var add : Vector = new Vector();
 
     var trigger_list : Map<Physics2DRigidBody,Bool> = null;
 
-    public function new()
+    public function new(_engine: PhysicsEngine2D)
     {
+        engine = _engine;
     }
 
     public function apply_velocity(x: Float, y: Float)

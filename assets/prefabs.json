@@ -9,9 +9,6 @@
             "constructor" : ["physics2d", "$shape"]
         },
         {
-            "name" : "behavior.components.DamageInteractor"
-        },
-        {
             "name" : "scripting.luxe.ScriptComponent",
             "constructor" : ["@assets/scripts/EnemyScript.hx"]
         }

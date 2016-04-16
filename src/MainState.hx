@@ -141,20 +141,29 @@ class MainState extends State
             texture: image
         });
 
-        phys = player.add(new Physics2DBody(physics2d, Polygon.rectangle(100, 200, 32, 32, true), { name: 'Physics2DBody' }));
+        phys = player.add(new Physics2DBody(physics2d, Polygon.rectangle(100, 200, 16, 16, true), { name: 'Physics2DBody' }));
         player.pos.copy_from(phys.body.collider.position);
 
         phys.set_topdown_configuration(100, 0);
         phys.body.collision_response = false;
 
+<<<<<<< HEAD
         var weapon = player.add(new Weapon(physics2d, phys, { name: 'Weapon' }));
+=======
+        var animation = player.add(new SpriteAnimation({ name: 'anim' }));
+        animation.add_from_json_object(Luxe.resources.json('assets/player_anim.json').asset.json);
+        animation.animation = 'idle';
+        animation.play();
+
+        var weapon = player.add(new Weapon(physics2d, { name: 'Weapon' }));
+>>>>>>> origin/ld35-shapeshift
         weapon.bullet_layer = LAYER_PLAYER_BULLET;
 
         var dmg_recv = player.add(new DamageReceiver({ name: 'DamageReceiver' }));
 
         player_cap = player.add(new ShapeCapabilities(weapon, phys, dmg_recv, { name: 'ShapeCapabilities' }));
 
-        player_inp = player.add(new PlayerInput(phys, player_cap, weapon, { name: 'PlayerInput' }));
+        player_inp = player.add(new PlayerInput(phys, player_cap, weapon, animation, { name: 'PlayerInput' }));
     }
 
     function setup_debug()

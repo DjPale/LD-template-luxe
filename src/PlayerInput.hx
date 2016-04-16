@@ -2,6 +2,7 @@ import luxe.Input;
 import luxe.Sprite;
 import luxe.Vector;
 
+import luxe.components.sprite.SpriteAnimation;
 import physics2d.components.Physics2DBody;
 
 class PlayerInput extends luxe.Component
@@ -14,14 +15,16 @@ class PlayerInput extends luxe.Component
     var phys : Physics2DBody;
     var cap: ShapeCapabilities;
     var weapon: Weapon;
+    var animation: SpriteAnimation;
 
-    public function new(_phys: Physics2DBody, _cap: ShapeCapabilities, _weapon: Weapon, ?_options: luxe.options.ComponentOptions)
+    public function new(_phys: Physics2DBody, _cap: ShapeCapabilities, _weapon: Weapon, _animation: SpriteAnimation, ?_options: luxe.options.ComponentOptions)
     {
         super(_options);
 
         phys = _phys;
         cap = _cap;
         weapon = _weapon;
+        animation = _animation;
     }
 
     override function init()
@@ -93,6 +96,16 @@ class PlayerInput extends luxe.Component
         {
             y = 1;
         }
+
+        if (x > 0) {
+            animation.animation = 'turn_right';
+        } else if (x < 0) {
+            animation.animation = 'turn_left';
+        } else {
+            animation.animation = 'idle';
+        }
+
+        animation.play();
 
         phys.move(x, y);
     }

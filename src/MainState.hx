@@ -74,6 +74,10 @@ class MainState extends State
     {
     }
 
+    override function update(dt: Float)
+    {
+        spawner.update(dt);
+    }
 
     function setup()
     {
@@ -121,8 +125,7 @@ class MainState extends State
         spawner = new EnemySpawner(physics2d, player);
         spawner.enemy_layer = LAYER_ENEMY;
         spawner.bullet_layer = LAYER_ENEMY_BULLET;
-        spawner.spawn_enemy(new Vector(100, 100));
-        spawner.spawn_enemy(new Vector(150, 100));
+        spawner.spawn_mark();
 
         setup_debug();
     }

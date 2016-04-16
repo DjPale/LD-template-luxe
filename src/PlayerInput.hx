@@ -2,38 +2,26 @@ import luxe.Input;
 import luxe.Sprite;
 import luxe.Vector;
 
-import luxe.collision.shapes.Polygon;
-
-import physics2d.Physics2DRigidBody;
 import physics2d.components.Physics2DBody;
-
-import luxe.collision.data.ShapeCollision;
-
-import behavior.Bullet;
-import behavior.DamageDealer;
 
 class PlayerInput extends luxe.Component
 {
-    public var bullet_speed : Float = 200.0;
-    public var fire_rate : Float = 0.2;
-
     public var change_cooldown : Float = 1;
+    public var weapon_dir: Vector = new Vector(0, -1);
 
     var change_cooldown_cnt : Float = 0;
 
-    var fire_rate_cnt : Float = 0;
-
     var phys : Physics2DBody;
     var cap: ShapeCapabilities;
-    var dmg: DamageDealer;
+    var weapon: Weapon;
 
-    public function new(_phys: Physics2DBody, _cap: ShapeCapabilities, _dmg: DamageDealer, ?_options: luxe.options.ComponentOptions)
+    public function new(_phys: Physics2DBody, _cap: ShapeCapabilities, _weapon: Weapon, ?_options: luxe.options.ComponentOptions)
     {
         super(_options);
 
         phys = _phys;
         cap = _cap;
-        dmg = _dmg;
+        weapon = _weapon;
     }
 
     override function init()
@@ -53,7 +41,6 @@ class PlayerInput extends luxe.Component
     {
         handle_input();
 
-        if (fire_rate_cnt > 0) fire_rate_cnt -= dt;
         if (change_cooldown_cnt > 0) change_cooldown_cnt -= dt;
     }
 
@@ -73,7 +60,7 @@ class PlayerInput extends luxe.Component
 
         if (Luxe.input.inputdown("fire"))
         {
-            fire();
+            weapon.fire(weapon_dir);
         }
 
         if (Luxe.input.inputdown("chg_attack"))
@@ -108,38 +95,5 @@ class PlayerInput extends luxe.Component
         }
 
         phys.move(x, y);
-    }
-
-    function fire()
-    {
-        if (fire_rate_cnt > 0) return;
-
-        fire_rate_cnt = fire_rate;
-
-        var bullet = new Sprite({
-            name: 'bullet',
-            name_unique: true,
-            size: new Vector(2, 2),
-        });
-
-        bullet.pos.copy_from(entity.pos);
-
-        var bullet_phys = bullet.add(
-            new Physics2DBody(
-                phys.body.engine,
-                Polygon.rectangle(bullet.pos.x, bullet.pos.y, 2, 2),
-                { name: 'Bullet' })
-            );
-
-        bullet_phys.set_topdown_configuration(bullet_speed, 1);
-        bullet_phys.body.collision_response = false;
-        bullet_phys.body.layer = 3;
-        bullet_phys.move(0, -1);
-
-        var bul_dmg = bullet.add(new DamageDealer({ name: 'DamageDealer' }));
-        bul_dmg.damage = dmg.damage;
-
-        bullet.add(new Bullet());
-
     }
 }

@@ -10,7 +10,6 @@ typedef ShapeTemplate = {
     speed: Float
 };
 
-
 class ShapeCapabilities extends Component
 {
     public var attack : Float = 1;
@@ -18,18 +17,21 @@ class ShapeCapabilities extends Component
     public var speed : Float = 1;
 
     public static var templates : Array<ShapeTemplate> = new Array<ShapeTemplate>();
+    public static var SHAPE_ATTACK : Int = 0;
+    public static var SHAPE_DEFEND : Int = 1;
+    public static var SHAPE_SPEED : Int = 2;
 
     var base_attack : Int;
     var base_defense : Int;
     var base_speed : Int;
 
     var _defense : DamageReceiver;
-    var _attack : DamageDealer;
+    var _attack : Weapon;
     var _speed : Physics2DBody;
 
     public var current_shape(default,null) : Int;
 
-    public function new(_atk: DamageDealer, _spd: Physics2DBody, _def: DamageReceiver, ?_options: luxe.options.ComponentOptions)
+    public function new(_atk: Weapon, _spd: Physics2DBody, _def: DamageReceiver, ?_options: luxe.options.ComponentOptions)
     {
         super(_options);
 

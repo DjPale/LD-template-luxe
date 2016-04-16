@@ -36,6 +36,7 @@ class MainState extends State
     var watcher: DebugWatcher;
 
     var phys : Physics2DBody;
+    var player : Sprite;
     var player_inp : PlayerInput;
     var player_cap : ShapeCapabilities;
 
@@ -44,6 +45,11 @@ class MainState extends State
     var light_batcher : Batcher;
 
     var spawner : EnemySpawner;
+
+    public static var LAYER_PLAYER : Int = PhysicsEngine2D.LAYER_DEFAULT;
+    public static var LAYER_PLAYER_BULLET : Int = 3;
+    public static var LAYER_ENEMY_BULLET : Int = 4;
+    public static var LAYER_ENEMY : Int = 5;
 
     public function new(_global:GlobalData, _batcher:phoenix.Batcher)
     {
@@ -85,7 +91,12 @@ class MainState extends State
         physics2d.draw = true;
         physics2d.paused = false;
 
-        physics2d.set_layer_collision(2, 3, false);
+        physics2d.set_layer_collision(LAYER_PLAYER, LAYER_PLAYER_BULLET, false);
+        physics2d.set_layer_collision(LAYER_PLAYER_BULLET, LAYER_PLAYER_BULLET, false);
+
+        physics2d.set_layer_collision(LAYER_ENEMY, LAYER_ENEMY_BULLET, false);
+        physics2d.set_layer_collision(LAYER_ENEMY_BULLET, LAYER_ENEMY_BULLET, false);
+
 
         ShapeCapabilities.templates.push({
             attack: 2,
@@ -105,7 +116,9 @@ class MainState extends State
 
         setup_player();
 
-        spawner = new EnemySpawner(physics2d);
+        spawner = new EnemySpawner(physics2d, player);
+        spawner.enemy_layer = LAYER_ENEMY;
+        spawner.bullet_layer = LAYER_ENEMY_BULLET;
         spawner.spawn_enemy(new Vector(100, 100));
         spawner.spawn_enemy(new Vector(150, 100));
 
@@ -114,23 +127,23 @@ class MainState extends State
 
     function setup_player()
     {
-        var p = new luxe.Sprite({
+        player = new luxe.Sprite({
             name: 'player',
             size: new Vector(32, 32)
         });
 
-        phys = p.add(new Physics2DBody(physics2d, Polygon.rectangle(100, 200, 32, 32, true), { name: 'Physics2DBody' }));
-        p.pos.copy_from(phys.body.collider.position);
+        phys = player.add(new Physics2DBody(physics2d, Polygon.rectangle(100, 200, 32, 32, true), { name: 'Physics2DBody' }));
+        player.pos.copy_from(phys.body.collider.position);
 
         phys.set_topdown_configuration(100, 0);
         phys.body.collision_response = false;
 
-        var dmg_deal = p.add(new DamageDealer({ name: 'DamageDealer' }));
-        var dmg_recv = p.add(new DamageReceiver({ name: 'DamageReceiver' }));
+        var weapon = player.add(new Weapon(physics2d, { name: 'Weapon' }));
+        var dmg_recv = player.add(new DamageReceiver({ name: 'DamageReceiver' }));
 
-        player_cap = p.add(new ShapeCapabilities(dmg_deal, phys, dmg_recv, { name: 'ShapeCapabilities' }));
+        player_cap = player.add(new ShapeCapabilities(weapon, phys, dmg_recv, { name: 'ShapeCapabilities' }));
 
-        player_inp = p.add(new PlayerInput(phys, player_cap, dmg_deal, { name: 'PlayerInput' }));
+        player_inp = player.add(new PlayerInput(phys, player_cap, weapon, { name: 'PlayerInput' }));
     }
 
     function setup_debug()

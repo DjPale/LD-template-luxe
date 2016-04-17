@@ -46,6 +46,9 @@ class PlayerInput extends luxe.Component
     {
         handle_input();
 
+        clamp_position(phys.body.collider.position);
+        clamp_position(entity.pos);
+
         if (change_cooldown_cnt > 0) change_cooldown_cnt -= dt;
     }
 
@@ -56,6 +59,16 @@ class PlayerInput extends luxe.Component
         change_cooldown_cnt = change_cooldown;
 
         cap.apply_abilities(num);
+    }
+
+    function clamp_position(p: Vector)
+    {
+        if (entity == null) return;
+
+        var ofs = 12;
+
+        p.x = luxe.utils.Maths.clamp(p.x, ofs, Luxe.camera.size.x - ofs);
+        p.y = luxe.utils.Maths.clamp(p.y, ofs, Luxe.camera.size.y - ofs - 32);
     }
 
     function handle_input()

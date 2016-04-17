@@ -42,6 +42,9 @@ class MainState extends State
     var player_inp : PlayerInput;
     var player_cap : ShapeCapabilities;
 
+    var hud : Sprite;
+    var background : Sprite;
+
     var dispatcher : MessageDispatcher;
     var factory : TiledMapObjectFactory;
     var light_batcher : Batcher;
@@ -77,6 +80,8 @@ class MainState extends State
     override function update(dt: Float)
     {
         spawner.update(dt);
+
+        background.uv.y -= 40 * dt;
     }
 
     function setup()
@@ -101,8 +106,8 @@ class MainState extends State
         physics2d.set_layer_collision(LAYER_PLAYER_BULLET, LAYER_PLAYER_BULLET, false);
 
         physics2d.set_layer_collision(LAYER_ENEMY, LAYER_ENEMY_BULLET, false);
+        physics2d.set_layer_collision(LAYER_ENEMY, LAYER_ENEMY, false);
         physics2d.set_layer_collision(LAYER_ENEMY_BULLET, LAYER_ENEMY_BULLET, false);
-
 
         ShapeCapabilities.templates.push({
             attack: 2,
@@ -126,6 +131,8 @@ class MainState extends State
         spawner.enemy_layer = LAYER_ENEMY;
         spawner.bullet_layer = LAYER_ENEMY_BULLET;
         spawner.spawn_mark();
+
+        setup_hud();
 
         setup_debug();
     }
@@ -154,16 +161,40 @@ class MainState extends State
 
         var animation = player.add(new SpriteAnimation({ name: 'anim' }));
         animation.add_from_json_object(Luxe.resources.json('assets/player_anim.json').asset.json);
-        animation.animation = 'idle';
+        animation.animation = 'attack_default';
         animation.play();
 
+        var weapon = new Weapon(physics2d, phys, { name: 'Weapon' });
         weapon.bullet_layer = LAYER_PLAYER_BULLET;
+        player.add(weapon);
 
         var dmg_recv = player.add(new DamageReceiver({ name: 'DamageReceiver' }));
 
         player_cap = player.add(new ShapeCapabilities(weapon, phys, dmg_recv, { name: 'ShapeCapabilities' }));
 
         player_inp = player.add(new PlayerInput(phys, player_cap, weapon, animation, { name: 'PlayerInput' }));
+    }
+
+    function setup_hud()
+    {
+        hud = new Sprite({
+            name: 'hud',
+            pos: new Vector(Luxe.camera.size.x / 2, Luxe.camera.size.y - 16),
+            texture: Luxe.resources.texture('assets/gfx/ui.png'),
+            //batcher: global.ui
+        });
+
+        var ratio = Luxe.screen.w / Luxe.screen.h;
+
+    	background = new Sprite({
+    		name: 'background',
+    		texture: Luxe.resources.texture('assets/background.png'),
+    		size: new Vector(Luxe.screen.w, Luxe.screen.w / ratio),
+    		centered: false,
+    		depth: -1
+    		});
+
+    	background.texture.clamp_s = background.texture.clamp_t = phoenix.Texture.ClampType.repeat;
     }
 
     function setup_debug()

@@ -20,6 +20,24 @@ class EnemySpawner
     public var enemy_layer : Int = PhysicsEngine2D.LAYER_DEFAULT;
     public var bullet_layer : Int = PhysicsEngine2D.LAYER_DEFAULT;
     public var spawn_interval : Float = 5;
+    public var spawn_row_ofs : Vector = new Vector(2, 4);
+
+    public var spawn_blocks : Array<Array<String>> = [
+        [
+        "   0       0   ",
+        "     1   1     ",
+        "0      2      0"
+        ],
+        [
+        "  0        0   ",
+        " 2     0     2 ",
+        "    2     2    ",
+        ]
+    ];
+
+    public var spawn_marks : String = "0x1xx0xx1x1";
+
+    var spawn_mark_idx = 0;
 
     var spawn_interval_cnt : Float = 0;
 
@@ -48,15 +66,46 @@ class EnemySpawner
 
     public function spawn_mark()
     {
-        for (i in 0...6)
-        {
-            spawn_enemy(new Vector(10 + i*(base_size + 8),-base_size));
-        }
-
         spawn_interval_cnt = spawn_interval;
+
+        spawn_mark_idx++;
+
+        if (spawn_mark_idx >= spawn_marks.length) spawn_mark_idx = 0;
+
+        var m : String = spawn_marks.charAt(spawn_mark_idx);
+
+        var idx = Std.parseInt(m);
+        if (idx == null) return;
+
+        trace('spawn mark $spawn_mark_idx block idx $idx');
+
+        var block = spawn_blocks[idx];
+        var y_ofs = -1;
+
+        for (row_idx in 0...block.length)
+        {
+            y_ofs--;
+
+            var row = block[block.length - row_idx - 1];
+
+            for (ch_idx in 0...row.length)
+            {
+                var e_type = Std.parseInt(row.charAt(ch_idx));
+
+                if (e_type != null)
+                {
+                    spawn_enemy(
+                        new Vector(
+                            ch_idx * (base_size + spawn_row_ofs.x) + base_size / 2 + 10,
+                            y_ofs * (base_size + spawn_row_ofs.y) - base_size / 2),
+                        e_type,
+                        idx % 3);
+                }
+            }
+        }
     }
 
-    public function spawn_enemy(spos: Vector) : Sprite
+    public function spawn_enemy(spos: Vector, ?_type : Int = -1, ?_move : Int = 0) : Sprite
     {
         var image = Luxe.resources.texture('assets/gfx/enemies.png');
             image.filter_min = image.filter_mag = FilterType.nearest;
@@ -70,8 +119,10 @@ class EnemySpawner
 
         var phys = sprite.add(new Physics2DBody(
             physics2d,
-            Polygon.square(spos.x, spos.y, base_size)
+            new Circle(spos.x, spos.y, base_size - 10)
         ));
+
+        sprite.pos.copy_from(phys.body.collider.position);
 
         phys.set_topdown_configuration(base_movespeed, 1);
         phys.body.layer = enemy_layer;
@@ -90,7 +141,17 @@ class EnemySpawner
         sprite.add(cap);
 
         var be = new BasicEnemy(player, phys, cap, { name: 'BasicEnemy' });
-        be.cap_type = Luxe.utils.random.int(0, 3);
+
+        if (_type == -1)
+        {
+            be.cap_type = Luxe.utils.random.int(0, 3);
+        }
+        else
+        {
+            be.cap_type = _type;
+        }
+
+        be.move_type = _move;
 
         var animation = sprite.add(new SpriteAnimation({ name: 'anim' }));
         animation.add_from_json_object(Luxe.resources.json('assets/enemies_anim.json').asset.json);

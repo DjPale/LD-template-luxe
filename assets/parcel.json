@@ -2,7 +2,8 @@
     "textures" : [
         { "id" : "assets/gfx/player.png" },
         { "id" : "assets/gfx/enemies.png" },
-        { "id" : "assets/gfx/ui.png" }
+        { "id" : "assets/gfx/ui.png" },
+        { "id" : "assets/background.png" }
     ],
     "text" : [
         { "id" : "assets/testmap.tmx" },

@@ -16,8 +16,9 @@ class Weapon extends Component
 {
     public var damage : Int = 1;
     public var fire_rate : Float = 0.2;
-    public var bullet_speed : Float = 100;
+    public var bullet_speed : Float = 300;
     public var bullet_layer : Int = PhysicsEngine2D.LAYER_DEFAULT;
+    public var bullet_size : Vector = new Vector(4, 4);
 
     var fire_rate_cnt : Float = 0;
 
@@ -46,7 +47,8 @@ class Weapon extends Component
         var bullet = new Sprite({
             name: 'bullet',
             name_unique: true,
-            size: new Vector(2, 2),
+            size: bullet_size,
+            color: new luxe.Color().rgb(0xffff00)
         });
 
         bullet.pos.copy_from(entity.pos);
@@ -54,7 +56,7 @@ class Weapon extends Component
         var bullet_phys = bullet.add(
             new Physics2DBody(
                 physics2d,
-                Polygon.rectangle(bullet.pos.x, bullet.pos.y, 2, 2),
+                Polygon.rectangle(bullet.pos.x, bullet.pos.y, bullet_size.x, bullet_size.y),
                 { name: 'Bullet' })
             );
 

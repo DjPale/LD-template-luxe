@@ -63,7 +63,7 @@ class Main extends luxe.Game
         global.states = new States({ name: 'states' });
         global.states.add(new MenuState(global, Luxe.renderer.batcher));
         global.states.add(new MainState(global, Luxe.renderer.batcher));
-        global.states.set('MainState');
+        global.states.set('MenuState');
     }
 
     function setup_canvas()

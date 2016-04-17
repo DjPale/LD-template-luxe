@@ -57,6 +57,8 @@ class MainState extends State
 
     var msg_reset : String;
 
+    public var has_done_init : Bool = false;
+
     public static var LAYER_PLAYER : Int = PhysicsEngine2D.LAYER_DEFAULT;
     public static var LAYER_PLAYER_BULLET : Int = 3;
     public static var LAYER_ENEMY_BULLET : Int = 4;
@@ -79,6 +81,13 @@ class MainState extends State
         setup();
     }
 
+    override function onleave<T>(ignored:T)
+    {
+        trace('leave state ' + this.name);
+
+        cleanup();
+    }
+
     override function onmousemove(event: luxe.MouseEvent)
     {
     }
@@ -92,6 +101,13 @@ class MainState extends State
         if (event.keycode == Key.key_h)
         {
             global.canvas.visible = !global.canvas.visible;
+        }
+        if (event.keycode == Key.key_x)
+        {
+            if (global.states.current_state == this)
+            {
+                global.states.set('MenuState');
+            }
         }
     }
 
@@ -120,6 +136,8 @@ class MainState extends State
 
     function reset_level()
     {
+        if (global.states.current_state != this) return;
+
         reset_scene.empty();
         reset_player();
         spawner.reset();
@@ -128,6 +146,13 @@ class MainState extends State
 
     function setup()
     {
+        if (has_done_init)
+        {
+            reset_level();
+            show_shit(true);
+            return;
+        }
+
         reset_scene = new Scene('reset_scene');
 
         watcher = new DebugWatcher();
@@ -186,6 +211,8 @@ class MainState extends State
         spawner.run();
 
         msg_reset = Luxe.events.listen('LevelReset', reset_level_delayed);
+
+        has_done_init = true;
     }
 
     function setup_player()
@@ -294,6 +321,13 @@ class MainState extends State
 
     }
 
+    function show_shit(visible: Bool)
+    {
+        background.visible = visible;
+        hud.visible = visible;
+        global.canvas.visible = visible;
+    }
+
     function cleanup()
     {
         //Luxe.events.unlisten(msg_reset);
@@ -302,5 +336,7 @@ class MainState extends State
 
         reset_scene.empty();
         spawner.running = false;
+
+        show_shit(false);
     }
 }

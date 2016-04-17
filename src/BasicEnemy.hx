@@ -19,16 +19,18 @@ class BasicEnemy extends Component
     public var move_type : Int = 0;
 
     var phys : Physics2DBody;
+    var sound_player : SoundPlayer;
 
     var orig_pos : Vector = new Vector();
 
-    public function new(_player: Entity, _phys: Physics2DBody, _cap: ShapeCapabilities, ?_options: luxe.options.ComponentOptions)
+    public function new(_player: Entity, _phys: Physics2DBody, _cap: ShapeCapabilities, _sound_player: SoundPlayer, ?_options: luxe.options.ComponentOptions)
     {
         super(_options);
 
         player = _player;
         cap = _cap;
         phys = _phys;
+        sound_player = _sound_player;
     }
 
     function move_func_1(vec: Vector)
@@ -76,6 +78,7 @@ class BasicEnemy extends Component
 
     function ondead(_)
     {
+        sound_player.play('enemy_explodes', 0.7);
         entity.destroy();
     }
 

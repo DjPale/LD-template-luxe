@@ -27,8 +27,6 @@
 - Rotating enemies
 
 ## c2
-    - Sfx (Explosion - player + enemies)
-
     - Start Menu - credits
 
     - GUI buttons update in main game
@@ -42,6 +40,7 @@
     - Starfield 2.0
 
     - Level design
+        Moar waves og levels
 
     - Transitions
         Level

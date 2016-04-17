@@ -11,9 +11,12 @@
     "shaders" : [
         { "id" : "nmaplit", "vert_id" : "default", "frag_id" : "assets/frag.nmaplit.glsl" }
     ],
+    "sounds" : [
+        { "id" : "assets/sfx/CK_Blaster_Shot-226.wav", "name" : "shot", "is_stream" : true }
+    ],
     "json" : [
         { "id" : "assets/prefabs.json" },
-        { "id": "assets/player_anim.json" },
-        { "id": "assets/enemies_anim.json" }
+        { "id" : "assets/player_anim.json" },
+        { "id" : "assets/enemies_anim.json" }
     ]
 }

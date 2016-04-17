@@ -92,7 +92,6 @@ class EnemySpawner
         var be = new BasicEnemy(player, phys, cap, { name: 'BasicEnemy' });
         be.cap_type = Luxe.utils.random.int(0, 3);
 
-        trace('be.cap_type: ' + be.cap_type);
         var animation = sprite.add(new SpriteAnimation({ name: 'anim' }));
         animation.add_from_json_object(Luxe.resources.json('assets/enemies_anim.json').asset.json);
         if (be.cap_type == 0) {

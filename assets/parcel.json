@@ -16,7 +16,9 @@
         { "id" : "assets/fonts/font.fnt" }
     ],
     "sounds" : [
-        { "id" : "assets/sfx/CK_Blaster_Shot-226.wav", "name" : "shot", "is_stream" : true }
+        { "id" : "assets/sfx/blaster.wav", "name" : "blaster" },
+        { "id" : "assets/sfx/impact.wav", "name" : "impact" },
+        { "id" : "assets/sfx/transform.wav", "name" : "transform" }
     ],
     "json" : [
         { "id" : "assets/prefabs.json" },

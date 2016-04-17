@@ -2,22 +2,15 @@ import luxe.resource.Resource.AudioResource;
 import luxe.Audio;
 
 class SoundPlayer {
-    var blaster: AudioResource;
-    var impact: AudioResource;
-    var master_volume_modifier: Float = 0.5;
+    var sfx_blaster: AudioResource;
+    var sfx_impact: AudioResource;
+    var sfx_transform: AudioResource;
+    var master_volume_modifier: Float = 0.25;
 
     public function new() {
-
-        var load = snow.api.Promise.all([
-            Luxe.resources.load_audio('assets/sfx/blaster.wav'),
-            Luxe.resources.load_audio('assets/sfx/impact.wav'),
-            // Luxe.resources.load_audio('assets/ambience.ogg')
-        ]);
-
-        load.then(function(_) {
-            blaster = Luxe.resources.audio('assets/sfx/blaster.wav');
-            impact = Luxe.resources.audio('assets/sfx/impact.wav');
-        });
+        sfx_blaster = Luxe.resources.audio('assets/sfx/blaster.wav');
+        sfx_impact = Luxe.resources.audio('assets/sfx/impact.wav');
+        sfx_transform = Luxe.resources.audio('assets/sfx/transform.wav');
     }
 
 
@@ -28,13 +21,15 @@ class SoundPlayer {
         }
 
         volume *= master_volume_modifier;
+        trace('volume: ' + volume);
 
         var pitch = Luxe.utils.random.float(0.7, 1.0);
 
         var src : luxe.AudioSource = null;
         switch (id) {
-            case 'blaster': src = blaster.source;
-            case 'impact': src = impact.source;
+            case 'blaster': src = sfx_blaster.source;
+            case 'impact': src = sfx_impact.source;
+            case 'transform': src = sfx_transform.source;
         }
 
         var handle = Luxe.audio.play(src, volume);

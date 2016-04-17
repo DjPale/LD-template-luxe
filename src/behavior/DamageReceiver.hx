@@ -14,10 +14,13 @@ class DamageReceiver extends Component
     public var hitpoints : Int = 1;
 
     var dmg_msg : String;
+    var sound_player : SoundPlayer;
 
-    public function new(?_options: luxe.options.ComponentOptions)
+    public function new(_sound_player: SoundPlayer, ?_options: luxe.options.ComponentOptions)
     {
         super(_options);
+
+        sound_player = _sound_player;
     }
 
     override function init()
@@ -33,6 +36,10 @@ class DamageReceiver extends Component
     function ondamaged(e: DamageDealerParams)
     {
         trace('damage from ${e.source.entity.name}');
+
+        if (entity.name == 'player') {
+            sound_player.play('impact');
+        }
 
         hitpoints -= e.source.damage;
 

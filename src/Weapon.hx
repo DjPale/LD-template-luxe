@@ -26,13 +26,15 @@ class Weapon extends Component
 
     var physics2d : PhysicsEngine2D;
     var phys : Physics2DBody;
+    var sound_player : SoundPlayer;
 
-    public function new(_physics2d: PhysicsEngine2D, _phys: Physics2DBody, ?_options: luxe.options.ComponentOptions)
+    public function new(_physics2d: PhysicsEngine2D, _phys: Physics2DBody, _sound_player: SoundPlayer, ?_options: luxe.options.ComponentOptions)
     {
         super(_options);
 
         physics2d = _physics2d;
         phys = _phys;
+        sound_player = _sound_player;
 
         scene = Luxe.scene;
     }
@@ -45,6 +47,12 @@ class Weapon extends Component
     public function fire(direction: Vector)
     {
         if (fire_rate_cnt > 0) return;
+
+        var volume = 1.0;
+        if (entity.name != 'player') {
+            volume = 0.1;
+        }
+        sound_player.play('blaster', volume);
 
         fire_rate_cnt = fire_rate;
 

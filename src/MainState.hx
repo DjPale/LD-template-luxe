@@ -51,6 +51,7 @@ class MainState extends State
     var light_batcher : Batcher;
 
     var spawner : EnemySpawner;
+    var sound_player : SoundPlayer;
 
     var reset_scene : Scene;
 
@@ -175,9 +176,11 @@ class MainState extends State
             speed: 1.5,
         });
 
+        sound_player = new SoundPlayer();
+
         setup_player();
 
-        spawner = new EnemySpawner(physics2d, player);
+        spawner = new EnemySpawner(physics2d, player, sound_player);
         spawner.enemy_layer = LAYER_ENEMY;
         spawner.bullet_layer = LAYER_ENEMY_BULLET;
         spawner.scene = reset_scene;
@@ -186,9 +189,6 @@ class MainState extends State
 
         setup_debug();
 
-        start_level();
-
-        msg_reset = Luxe.events.listen("LevelReset", reset_level_delayed);
     }
 
     function setup_player()
@@ -218,12 +218,12 @@ class MainState extends State
         animation.animation = 'attack_default';
         animation.play();
 
-        var weapon = new Weapon(physics2d, phys, { name: 'Weapon' });
+        var weapon = new Weapon(physics2d, phys, sound_player, { name: 'Weapon' });
         weapon.bullet_layer = LAYER_PLAYER_BULLET;
         weapon.scene = reset_scene;
         player.add(weapon);
 
-        var dmg_recv = player.add(new DamageReceiver({ name: 'DamageReceiver' }));
+        var dmg_recv = player.add(new DamageReceiver(sound_player, { name: 'DamageReceiver' }));
 
         player_cap = player.add(new ShapeCapabilities(weapon, phys, dmg_recv, { name: 'ShapeCapabilities' }));
 

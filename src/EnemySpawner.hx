@@ -46,12 +46,13 @@ class EnemySpawner
 
     var physics2d : PhysicsEngine2D;
     var player : Entity;
+    var sound_player : SoundPlayer;
 
-
-    public function new(_physics2d: PhysicsEngine2D, _player: Entity)
+    public function new(_physics2d: PhysicsEngine2D, _player: Entity, _sound_player: SoundPlayer)
     {
         physics2d = _physics2d;
         player = _player;
+        sound_player = _sound_player;
 
         scene = Luxe.scene;
     }
@@ -148,11 +149,11 @@ class EnemySpawner
         phys.body.layer = enemy_layer;
         phys.body.collision_response = false;
 
-        var dmg_recv = new DamageReceiver({ name: 'DamageReceiver' });
+        var dmg_recv = new DamageReceiver(sound_player, { name: 'DamageReceiver' });
         dmg_recv.hitpoints = 2;
         sprite.add(dmg_recv);
 
-        var weapon = sprite.add(new Weapon(physics2d, phys, { name: 'Weapon' }));
+        var weapon = sprite.add(new Weapon(physics2d, phys, sound_player, { name: 'Weapon' }));
         weapon.bullet_layer = bullet_layer;
         weapon.fire_rate = 2;
         weapon.bullet_speed = 100;

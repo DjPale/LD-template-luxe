@@ -14,8 +14,13 @@ class BasicEnemy extends Component
     var player : Entity;
     var player_body : Physics2DBody;
     var cap : ShapeCapabilities;
+
     public var cap_type : Int = 0;
+    public var move_type : Int = 0;
+
     var phys : Physics2DBody;
+
+    var orig_pos : Vector = new Vector();
 
     public function new(_player: Entity, _phys: Physics2DBody, _cap: ShapeCapabilities, ?_options: luxe.options.ComponentOptions)
     {
@@ -26,6 +31,18 @@ class BasicEnemy extends Component
         phys = _phys;
     }
 
+    function move_func_1(vec: Vector)
+    {
+        vec.x = orig_pos.x + Math.cos(vec.y / Luxe.camera.size.y * 20) * 10.0;
+    }
+
+    function move_func_2(vec: Vector)
+    {
+        var add = Math.cos(vec.y / Luxe.camera.size.y * 3) * (orig_pos.x - Luxe.camera.size.x / 2);
+
+        vec.x = orig_pos.x + add;
+    }
+
     override function init()
     {
         dead_msg = entity.events.listen(DamageReceiver.message, ondead);
@@ -34,6 +51,8 @@ class BasicEnemy extends Component
         player_body = player.get('Physics2DBody');
 
         cap.apply_abilities(cap_type);
+
+        orig_pos.copy_from(entity.pos);
 
         phys.move(0, 1);
     }
@@ -64,6 +83,16 @@ class BasicEnemy extends Component
         {
             var dir = Vector.Subtract(player_body.proxy_pos, entity.pos);
             weapon.fire(dir);
+        }
+
+        // TODO: temp!
+        if (move_type == 1)
+        {
+            move_func_1(phys.body.collider.position);
+        }
+        else if (move_type == 2)
+        {
+            move_func_2(phys.body.collider.position);
         }
 
     }

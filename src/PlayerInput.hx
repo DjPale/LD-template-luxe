@@ -21,12 +21,14 @@ class PlayerInput extends luxe.Component
     var animation: SpriteAnimation;
     var dmg_recv: DamageReceiver;
 
-    public var player_state = 'attack';
+    public var player_state : String = 'attack';
+    var previous_player_state : String = 'attack';
 
     var msg_dead : String;
     var msg_col : String;
+    var sound_player : SoundPlayer;
 
-    public function new(_phys: Physics2DBody, _cap: ShapeCapabilities, _weapon: Weapon, _animation: SpriteAnimation, ?_options: luxe.options.ComponentOptions)
+    public function new(_phys: Physics2DBody, _cap: ShapeCapabilities, _weapon: Weapon, _animation: SpriteAnimation, _sound_player: SoundPlayer, ?_options: luxe.options.ComponentOptions)
     {
         super(_options);
 
@@ -34,6 +36,7 @@ class PlayerInput extends luxe.Component
         cap = _cap;
         weapon = _weapon;
         animation = _animation;
+        sound_player = _sound_player;
     }
 
     override function init()
@@ -153,6 +156,13 @@ class PlayerInput extends luxe.Component
             {
                 y = 1;
             }
+        }
+
+        if (previous_player_state != player_state) {
+
+            previous_player_state = player_state;
+            sound_player.play('transform');
+            trace('state changed!');
         }
 
         animation.animation = player_state + '_' + player_direction;

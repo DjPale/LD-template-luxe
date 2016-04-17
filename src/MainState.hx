@@ -248,7 +248,7 @@ class MainState extends State
 
         player_cap = player.add(new ShapeCapabilities(weapon, phys, dmg_recv, { name: 'ShapeCapabilities' }));
 
-        player_inp = player.add(new PlayerInput(phys, player_cap, weapon, animation, { name: 'PlayerInput' }));
+        player_inp = player.add(new PlayerInput(phys, player_cap, weapon, animation, sound_player, { name: 'PlayerInput' }));
         player_inp.input_enabled = true;
     }
 

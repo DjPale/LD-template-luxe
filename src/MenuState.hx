@@ -85,6 +85,8 @@ class MenuState extends State
 
     function setup()
     {
+        input_disable = true;
+
         txt1 = new Text({
             name: 'Title',
             font: global.font,

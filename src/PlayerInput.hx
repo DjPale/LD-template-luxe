@@ -19,10 +19,12 @@ class PlayerInput extends luxe.Component
     var cap: ShapeCapabilities;
     var weapon: Weapon;
     var animation: SpriteAnimation;
+    var dmg_recv: DamageReceiver;
 
-    var player_state = 'attack';
+    public var player_state = 'attack';
 
     var msg_dead : String;
+    var msg_col : String;
 
     public function new(_phys: Physics2DBody, _cap: ShapeCapabilities, _weapon: Weapon, _animation: SpriteAnimation, ?_options: luxe.options.ComponentOptions)
     {
@@ -47,6 +49,9 @@ class PlayerInput extends luxe.Component
         Luxe.input.bind_key("chg_speed", Key.key_3);
 
         msg_dead = entity.events.listen(DamageReceiver.message, ondead);
+        msg_col = entity.events.listen(Physics2DBody.message, oncollision);
+
+        dmg_recv = entity.get('DamageReceiver');
     }
 
     override public function update(dt: Float)
@@ -59,18 +64,35 @@ class PlayerInput extends luxe.Component
         if (change_cooldown_cnt > 0) change_cooldown_cnt -= dt;
     }
 
+    override public function ondestroy()
+    {
+        entity.events.unlisten(msg_dead);
+        entity.events.unlisten(msg_col);
+    }
+
+    function oncollision(e: Physics2DBodyCollisionParams)
+    {
+        if (StringTools.startsWith(e.target.name, 'enemy'))
+        {
+            e.target.get('DamageReceiver').deal(entity, 1);
+            dmg_recv.deal(e.target, 1);
+        }
+    }
+
     function ondead(_)
     {
         Luxe.events.fire('LevelReset');
     }
 
-    function change_shape(num: Int)
+    function change_shape(num: Int) : Bool
     {
-        if (change_cooldown_cnt > 0 || cap.current_shape == num) return;
+        if (change_cooldown_cnt > 0 || cap.current_shape == num) return false;
 
         change_cooldown_cnt = change_cooldown;
 
         cap.apply_abilities(num);
+
+        return true;
     }
 
     function clamp_position(p: Vector)
@@ -98,18 +120,15 @@ class PlayerInput extends luxe.Component
 
             if (Luxe.input.inputdown("chg_attack"))
             {
-                change_shape(0);
-                player_state = 'attack';
+                if (change_shape(0)) player_state = 'attack';
             }
             else if (Luxe.input.inputdown("chg_defense"))
             {
-                change_shape(1);
-                player_state = 'defence';
+                if (change_shape(1)) player_state = 'defence';
             }
             else if (Luxe.input.inputdown("chg_speed"))
             {
-                change_shape(2);
-                player_state = 'speed';
+                if (change_shape(2)) player_state = 'speed';
             }
 
             if (Luxe.input.inputdown("left"))

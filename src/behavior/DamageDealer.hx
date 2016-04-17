@@ -15,8 +15,7 @@ class DamageDealer extends Component
 
     public var damage : Int = 1;
 
-    public var destroy_on_impact : Bool = true;
-
+    public var destroy_on_impact : Bool = false;
 
     var col_msg : String;
 

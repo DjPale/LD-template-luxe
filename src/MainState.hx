@@ -50,6 +50,7 @@ class MainState extends State
     var light_batcher : Batcher;
 
     var spawner : EnemySpawner;
+    var sound_player : SoundPlayer;
 
     public static var LAYER_PLAYER : Int = PhysicsEngine2D.LAYER_DEFAULT;
     public static var LAYER_PLAYER_BULLET : Int = 3;
@@ -125,9 +126,11 @@ class MainState extends State
             speed: 1.5,
         });
 
+        sound_player = new SoundPlayer();
+
         setup_player();
 
-        spawner = new EnemySpawner(physics2d, player);
+        spawner = new EnemySpawner(physics2d, player, sound_player);
         spawner.enemy_layer = LAYER_ENEMY;
         spawner.bullet_layer = LAYER_ENEMY_BULLET;
         spawner.spawn_mark();
@@ -135,6 +138,7 @@ class MainState extends State
         setup_hud();
 
         setup_debug();
+
     }
 
     function setup_player()
@@ -164,11 +168,11 @@ class MainState extends State
         animation.animation = 'attack_default';
         animation.play();
 
-        var weapon = new Weapon(physics2d, phys, { name: 'Weapon' });
+        var weapon = new Weapon(physics2d, phys, sound_player, { name: 'Weapon' });
         weapon.bullet_layer = LAYER_PLAYER_BULLET;
         player.add(weapon);
 
-        var dmg_recv = player.add(new DamageReceiver({ name: 'DamageReceiver' }));
+        var dmg_recv = player.add(new DamageReceiver(sound_player, { name: 'DamageReceiver' }));
 
         player_cap = player.add(new ShapeCapabilities(weapon, phys, dmg_recv, { name: 'ShapeCapabilities' }));
 

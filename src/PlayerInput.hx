@@ -85,6 +85,8 @@ class PlayerInput extends luxe.Component
 
     function ondead(_)
     {
+        sound_player.play('player_explodes');
+
         Luxe.events.fire('LevelReset');
     }
 

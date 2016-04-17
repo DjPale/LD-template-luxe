@@ -166,7 +166,7 @@ class EnemySpawner
         var cap = new ShapeCapabilities(weapon, phys, dmg_recv, { name: 'ShapeCapabilities' });
         sprite.add(cap);
 
-        var be = new BasicEnemy(player, phys, cap, { name: 'BasicEnemy' });
+        var be = new BasicEnemy(player, phys, cap, sound_player, { name: 'BasicEnemy' });
 
         if (_type == -1)
         {

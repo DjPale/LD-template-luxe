@@ -5,12 +5,16 @@ class SoundPlayer {
     var sfx_blaster: AudioResource;
     var sfx_impact: AudioResource;
     var sfx_transform: AudioResource;
+    var sfx_enemy_explodes: AudioResource;
+    var sfx_player_explodes: AudioResource;
     var master_volume_modifier: Float = 0.25;
 
     public function new() {
         sfx_blaster = Luxe.resources.audio('assets/sfx/blaster.wav');
         sfx_impact = Luxe.resources.audio('assets/sfx/impact.wav');
         sfx_transform = Luxe.resources.audio('assets/sfx/transform.wav');
+        sfx_enemy_explodes = Luxe.resources.audio('assets/sfx/enemy_explodes.wav');
+        sfx_player_explodes = Luxe.resources.audio('assets/sfx/player_explodes.wav');
     }
 
 
@@ -30,6 +34,8 @@ class SoundPlayer {
             case 'blaster': src = sfx_blaster.source;
             case 'impact': src = sfx_impact.source;
             case 'transform': src = sfx_transform.source;
+            case 'enemy_explodes': src = sfx_enemy_explodes.source;
+            case 'player_explodes': src = sfx_player_explodes.source;
         }
 
         var handle = Luxe.audio.play(src, volume);

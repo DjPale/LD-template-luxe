@@ -13,8 +13,11 @@ class PlayerInput extends luxe.Component
     public var weapon_dir: Vector = new Vector(0, -1);
     public var input_enabled : Bool = false;
     public var dual_weapon : Bool = true;
+    public var auto_switch : Float = 3.0;
 
     var change_cooldown_cnt : Float = 0;
+
+    var auto_switch_cnt : Float = 0;
 
     var phys : Physics2DBody;
     var cap: ShapeCapabilities;
@@ -66,6 +69,17 @@ class PlayerInput extends luxe.Component
         clamp_position(entity.pos);
 
         if (change_cooldown_cnt > 0) change_cooldown_cnt -= dt;
+
+        if (auto_switch_cnt > 0)
+        {
+            auto_switch_cnt -= dt;
+
+            if (auto_switch_cnt <= 0)
+            {
+                trace('try to change to ' + ((cap.current_shape + 1) % 3));
+                change_shape((cap.current_shape + 1) % 3);
+            }
+        }
     }
 
     override public function ondestroy()
@@ -90,11 +104,18 @@ class PlayerInput extends luxe.Component
         Luxe.events.fire('LevelReset');
     }
 
+    public function auto_switch_on(t: Float)
+    {
+        auto_switch = t;
+        auto_switch_cnt = auto_switch;
+    }
+
     function change_shape(num: Int) : Bool
     {
         if (change_cooldown_cnt > 0 || cap.current_shape == num) return false;
 
         change_cooldown_cnt = change_cooldown;
+        auto_switch_cnt = auto_switch;
 
         cap.apply_abilities(num);
 
@@ -131,6 +152,9 @@ class PlayerInput extends luxe.Component
     {
         var x = 0;
         var y = 0;
+
+        var can_swith = (auto_switch > 0);
+
         var player_direction = 'default';
 
         if (input_enabled)
@@ -140,17 +164,17 @@ class PlayerInput extends luxe.Component
                 fire();
             }
 
-            if (Luxe.input.inputdown("chg_attack"))
+            if (can_swith && Luxe.input.inputdown("chg_attack"))
             {
-                if (change_shape(0)) player_state = 'attack';
+                change_shape(0);
             }
-            else if (Luxe.input.inputdown("chg_defense"))
+            else if (can_swith && Luxe.input.inputdown("chg_defense"))
             {
-                if (change_shape(1)) player_state = 'defence';
+                change_shape(1);
             }
-            else if (Luxe.input.inputdown("chg_speed"))
+            else if (can_swith && Luxe.input.inputdown("chg_speed"))
             {
-                if (change_shape(2)) player_state = 'speed';
+                change_shape(2);
             }
 
             if (Luxe.input.inputdown("left"))
@@ -177,11 +201,15 @@ class PlayerInput extends luxe.Component
             }
         }
 
+        var cur_shape = cap.current_shape;
+        if (cur_shape == ShapeCapabilities.SHAPE_ATTACK) player_state = "attack";
+        if (cur_shape == ShapeCapabilities.SHAPE_DEFEND) player_state = "defence";
+        if (cur_shape == ShapeCapabilities.SHAPE_SPEED) player_state = "speed";
+
         if (previous_player_state != player_state) {
 
             previous_player_state = player_state;
             sound_player.play('transform');
-            trace('state changed!');
         }
 
         animation.animation = player_state + '_' + player_direction;

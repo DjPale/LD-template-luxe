@@ -14,9 +14,9 @@ x Attack
     NEI! Higher ROF
     x No damage increase
 
-- Player Spawn time decrease
+x Player Spawn time decrease
 
-- Auto-rotate abilities flag
+x Auto-rotate abilities flag
 
 - HP Text
 
@@ -40,6 +40,8 @@ x Attack
 - Rotating enemies
 
 ## c2
+    - Cooldown visuals!
+
     - Particle fx
         - Explosion
         - Afterburn

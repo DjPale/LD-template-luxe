@@ -253,6 +253,7 @@ class MainState extends State
         player_cap = player.add(new ShapeCapabilities(weapon, phys, dmg_recv, { name: 'ShapeCapabilities' }));
 
         player_inp = player.add(new PlayerInput(phys, player_cap, weapon, animation, sound_player, { name: 'PlayerInput' }));
+        player_inp.auto_switch_on(3.0);
         player_inp.input_enabled = true;
     }
 
@@ -266,6 +267,8 @@ class MainState extends State
 
         var anim = player.get('SpriteAnimation');
         player_inp.player_state = 'attack';
+
+        player_inp.auto_switch_on(3.0);
     }
 
     function setup_hud()

@@ -25,7 +25,6 @@ class SoundPlayer {
         }
 
         volume *= master_volume_modifier;
-        trace('volume: ' + volume);
 
         var pitch = Luxe.utils.random.float(0.7, 1.0);
 

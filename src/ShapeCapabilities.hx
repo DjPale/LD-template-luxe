@@ -7,7 +7,8 @@ import behavior.DamageDealer;
 typedef ShapeTemplate = {
     attack: Float,
     defense: Float,
-    speed: Float
+    speed: Float,
+    rof: Float
 };
 
 class ShapeCapabilities extends Component
@@ -15,6 +16,7 @@ class ShapeCapabilities extends Component
     public var attack : Float = 1;
     public var defense : Float = 1;
     public var speed : Float = 1;
+    public var rof : Float = 1;
 
     public static var templates : Array<ShapeTemplate> = new Array<ShapeTemplate>();
     public static var SHAPE_ATTACK : Int = 0;
@@ -24,6 +26,7 @@ class ShapeCapabilities extends Component
     var base_attack : Int;
     var base_defense : Int;
     var base_speed : Int;
+    var base_rof : Float;
 
     var _defense : DamageReceiver;
     var _attack : Weapon;
@@ -47,6 +50,7 @@ class ShapeCapabilities extends Component
         base_attack = _attack.damage;
         base_defense = _defense.max_hitpoints;
         base_speed = Std.int(_speed.move_speed.x);
+        base_rof = _attack.fire_rate;
     }
 
     function restore()
@@ -54,6 +58,7 @@ class ShapeCapabilities extends Component
         _attack.damage = base_attack;
         _defense.max_hitpoints = base_defense;
         _speed.move_speed.set_xy(base_speed, base_speed);
+        _attack.fire_rate = base_rof;
     }
 
     public function apply_abilities(num: Int)
@@ -69,6 +74,7 @@ class ShapeCapabilities extends Component
         _defense.max_hitpoints = Std.int(_defense.max_hitpoints * tmpl.defense);
         _defense.heal();
         _speed.move_speed.set_xy(_speed.move_speed.x * tmpl.speed, _speed.move_speed.x * tmpl.speed);
+        _attack.fire_rate = _attack.fire_rate * tmpl.rof;
     }
 
     override function init()

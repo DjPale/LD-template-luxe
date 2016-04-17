@@ -12,6 +12,7 @@ class PlayerInput extends luxe.Component
     public var change_cooldown : Float = 1;
     public var weapon_dir: Vector = new Vector(0, -1);
     public var input_enabled : Bool = false;
+    public var dual_weapon : Bool = true;
 
     var change_cooldown_cnt : Float = 0;
 
@@ -108,6 +109,22 @@ class PlayerInput extends luxe.Component
         p.y = luxe.utils.Maths.clamp(p.y, ofs, Luxe.camera.size.y - ofs - 32);
     }
 
+    function fire()
+    {
+        if (weapon.damage > 0)
+        {
+            if (dual_weapon && cap.current_shape == ShapeCapabilities.SHAPE_ATTACK)
+            {
+                var ready = weapon.fire(weapon_dir, false, new Vector(-10, 0));
+                if (ready) weapon.fire(weapon_dir, true, new Vector(10, 0));
+            }
+            else
+            {
+                weapon.fire(weapon_dir);
+            }
+        }
+    }
+
     function handle_input()
     {
         var x = 0;
@@ -118,7 +135,7 @@ class PlayerInput extends luxe.Component
         {
             if (Luxe.input.inputdown("fire"))
             {
-                weapon.fire(weapon_dir);
+                fire();
             }
 
             if (Luxe.input.inputdown("chg_attack"))

@@ -42,6 +42,7 @@ class MainState extends State
     var player : Sprite;
     var player_inp : PlayerInput;
     var player_cap : ShapeCapabilities;
+    var player_hp_text : Text;
 
     var hud : Sprite;
     var background : Sprite;
@@ -131,7 +132,7 @@ class MainState extends State
         reset_scene.empty();
         spawner.running = false;
 
-        Actuate.timer(2).onComplete(reset_level);
+        Actuate.timer(1).onComplete(reset_level);
     }
 
     function reset_level()
@@ -179,19 +180,22 @@ class MainState extends State
         physics2d.set_layer_collision(LAYER_ENEMY_BULLET, LAYER_ENEMY_BULLET, false);
 
         ShapeCapabilities.templates.push({
-            attack: 2,
+            attack: 1,
             defense: 1,
             speed: 1,
+            rof: 1,
         });
         ShapeCapabilities.templates.push({
-            attack: 1,
-            defense: 2,
-            speed: 1,
+            attack: 0,
+            defense: 10,
+            speed: 0.5,
+            rof: 0,
         });
         ShapeCapabilities.templates.push({
             attack: 1,
             defense: 1,
             speed: 1.5,
+            rof: 1,
         });
 
         sound_player = new SoundPlayer();
@@ -226,7 +230,7 @@ class MainState extends State
             texture: image
         });
 
-        phys = player.add(new Physics2DBody(physics2d, Polygon.rectangle(100, 200, 16, 16, true), { name: 'Physics2DBody' }));
+        phys = player.add(new Physics2DBody(physics2d, Polygon.rectangle(150, 300, 16, 16, true), { name: 'Physics2DBody' }));
         player.pos.copy_from(phys.body.collider.position);
 
         phys.set_topdown_configuration(150, 0);

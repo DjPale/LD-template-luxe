@@ -159,7 +159,7 @@ class EnemySpawner
 
         var weapon = sprite.add(new Weapon(physics2d, phys, sound_player, { name: 'Weapon' }));
         weapon.bullet_layer = bullet_layer;
-        weapon.fire_rate = 0.5;
+        weapon.fire_rate = 1;
         weapon.bullet_speed = 150;
         weapon.scene = scene;
 

@@ -44,9 +44,9 @@ class Weapon extends Component
         if (fire_rate_cnt > 0) fire_rate_cnt -= dt;
     }
 
-    public function fire(direction: Vector)
+    public function fire(direction: Vector, ?_ignore_cooldown: Bool = false, ?_ofs: Vector = null) : Bool
     {
-        if (fire_rate_cnt > 0) return;
+        if (!_ignore_cooldown && fire_rate_cnt > 0) return false;
 
         var volume = 1.0;
         if (entity.name != 'player') {
@@ -73,6 +73,8 @@ class Weapon extends Component
                 { name: 'Bullet' })
             );
 
+        if (_ofs != null) bullet_phys.body.collider.position.add(_ofs);
+
         bullet_phys.set_topdown_configuration(bullet_speed, 1);
         bullet_phys.body.collision_response = false;
         bullet_phys.body.layer = bullet_layer;
@@ -89,5 +91,6 @@ class Weapon extends Component
 
         bullet.add(new Bullet());
 
+        return true;
     }
 }

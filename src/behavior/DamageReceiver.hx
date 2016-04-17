@@ -12,6 +12,7 @@ class DamageReceiver extends Component
 
     public var max_hitpoints : Int = 1;
     public var hitpoints : Int = 1;
+    public var invulnerable : Bool = false;
 
     var dmg_msg : String;
     var sound_player : SoundPlayer;
@@ -35,11 +36,13 @@ class DamageReceiver extends Component
 
     public function deal(source: Entity, dmg: Int)
     {
-        trace('$dmg damage from ${source.name}');
-
         if (entity.name == 'player') {
             sound_player.play('impact');
         }
+
+        trace('$dmg damage from ${source.name} invuln=$invulnerable');
+
+        if (invulnerable) return;
 
         hitpoints -= dmg;
 

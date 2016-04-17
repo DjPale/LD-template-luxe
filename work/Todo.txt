@@ -1,26 +1,39 @@
 
 ## Tweaking (espie)
 
-- Def-mode
-    Invulnerable
-    Lasts max 3 secs
-    No shootz!
-    Slower
+x Def-mode
+    x 10 HP
+    x No shootz!
+    x Slower
 
-- Agile-mode
-    No change
+x Agile-mode
+    x No change
 
-- Attack
+x Attack
     2x Weapons - one from each wing
-    Higher ROF
-    No damage increase
+    NEI! Higher ROF
+    x No damage increase
+
+- Player Spawn time decrease
+
+- Auto-rotate abilities flag
+
+- HP Text
+
+- Score Text
 
 - Composite
 
 - Steering scale
 
-- Minimap
+- Small visual fixes
+    Player / Enemy hits
+        + Flash
+        + Shake
 
+- Cooldown
+
+- Minimap
 
 - Moving patterns
 

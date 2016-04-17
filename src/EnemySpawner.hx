@@ -1,6 +1,7 @@
 import luxe.Vector;
 import luxe.Sprite;
 import luxe.Entity;
+import luxe.Scene;
 
 import luxe.collision.shapes.Polygon;
 import luxe.collision.shapes.Circle;
@@ -21,6 +22,8 @@ class EnemySpawner
     public var bullet_layer : Int = PhysicsEngine2D.LAYER_DEFAULT;
     public var spawn_interval : Float = 5;
     public var spawn_row_ofs : Vector = new Vector(2, 4);
+    public var running : Bool = false;
+    public var scene : Scene;
 
     public var spawn_blocks : Array<Array<String>> = [
         [
@@ -49,10 +52,14 @@ class EnemySpawner
     {
         physics2d = _physics2d;
         player = _player;
+
+        scene = Luxe.scene;
     }
 
     public function update(dt: Float)
     {
+        if (!running) return;
+
         if (spawn_interval_cnt > 0)
         {
             spawn_interval_cnt -= dt;
@@ -62,6 +69,18 @@ class EnemySpawner
                 spawn_mark();
             }
         }
+    }
+
+    public function reset()
+    {
+        spawn_mark_idx = 0;
+        running = false;
+    }
+
+    public function run()
+    {
+        running = true;
+        spawn_mark();
     }
 
     public function spawn_mark()
@@ -114,7 +133,8 @@ class EnemySpawner
             name: 'enemy',
             name_unique: true,
             size: new Vector(base_size, base_size),
-            texture: image
+            texture: image,
+            scene: scene
         });
 
         var phys = sprite.add(new Physics2DBody(
@@ -136,6 +156,7 @@ class EnemySpawner
         weapon.bullet_layer = bullet_layer;
         weapon.fire_rate = 2;
         weapon.bullet_speed = 100;
+        weapon.scene = scene;
 
         var cap = new ShapeCapabilities(weapon, phys, dmg_recv, { name: 'ShapeCapabilities' });
         sprite.add(cap);

@@ -1,6 +1,7 @@
 import luxe.Component;
 import luxe.Sprite;
 import luxe.Vector;
+import luxe.Scene;
 
 import luxe.collision.shapes.Polygon;
 import luxe.collision.data.ShapeCollision;
@@ -19,6 +20,7 @@ class Weapon extends Component
     public var bullet_speed : Float = 300;
     public var bullet_layer : Int = PhysicsEngine2D.LAYER_DEFAULT;
     public var bullet_size : Vector = new Vector(4, 4);
+    public var scene : Scene;
 
     var fire_rate_cnt : Float = 0;
 
@@ -31,6 +33,8 @@ class Weapon extends Component
 
         physics2d = _physics2d;
         phys = _phys;
+
+        scene = Luxe.scene;
     }
 
     override function update(dt: Float)
@@ -48,7 +52,8 @@ class Weapon extends Component
             name: 'bullet',
             name_unique: true,
             size: bullet_size,
-            color: new luxe.Color().rgb(0xffff00)
+            color: new luxe.Color().rgb(0xffff00),
+            scene: scene
         });
 
         bullet.pos.copy_from(entity.pos);

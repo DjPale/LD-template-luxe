@@ -37,7 +37,7 @@ class DamageDealer extends Component
 
         fire_event(message, e.target, { source: this });
 
-        if (destroy_on_impact) entity.destroy();
+        if (destroy_on_impact && entity != null && !entity.destroyed) entity.destroy();
     }
 
     function fire_event(msg: String, tgt: Entity, params: DamageDealerParams)

@@ -4,6 +4,7 @@ import luxe.Text;
 import luxe.Vector;
 import luxe.Input;
 import luxe.Sprite;
+import luxe.Scene;
 
 import luxe.tween.Actuate;
 import luxe.tween.easing.Sine;
@@ -51,6 +52,10 @@ class MainState extends State
 
     var spawner : EnemySpawner;
 
+    var reset_scene : Scene;
+
+    var msg_reset : String;
+
     public static var LAYER_PLAYER : Int = PhysicsEngine2D.LAYER_DEFAULT;
     public static var LAYER_PLAYER_BULLET : Int = 3;
     public static var LAYER_ENEMY_BULLET : Int = 4;
@@ -73,8 +78,27 @@ class MainState extends State
         setup();
     }
 
+    override function onleave<T>(ignored:T)
+    {
+        trace('enter state ' + this.name);
+
+        cleanup();
+    }
+
     override function onmousemove(event: luxe.MouseEvent)
     {
+    }
+
+    override function onkeydown(event: KeyEvent)
+    {
+        if (event.keycode == Key.key_r)
+        {
+            reset_level();
+        }
+        if (event.keycode == Key.key_h)
+        {
+            global.canvas.visible = !global.canvas.visible;
+        }
     }
 
     override function update(dt: Float)
@@ -84,8 +108,34 @@ class MainState extends State
         background.uv.y -= 40 * dt;
     }
 
+    function start_level()
+    {
+        spawner.run();
+    }
+
+    function reset_level_delayed(_)
+    {
+        player.visible = false;
+        player_inp.input_enabled = false;
+
+        reset_scene.empty();
+        spawner.running = false;
+
+        Actuate.timer(2).onComplete(reset_level);
+    }
+
+    function reset_level()
+    {
+        reset_scene.empty();
+        reset_player();
+        spawner.reset();
+        spawner.run();
+    }
+
     function setup()
     {
+        reset_scene = new Scene('reset_scene');
+
         watcher = new DebugWatcher();
 
         // light_batcher = Luxe.renderer.create_batcher({
@@ -130,11 +180,15 @@ class MainState extends State
         spawner = new EnemySpawner(physics2d, player);
         spawner.enemy_layer = LAYER_ENEMY;
         spawner.bullet_layer = LAYER_ENEMY_BULLET;
-        spawner.spawn_mark();
+        spawner.scene = reset_scene;
 
         setup_hud();
 
         setup_debug();
+
+        start_level();
+
+        msg_reset = Luxe.events.listen("LevelReset", reset_level_delayed);
     }
 
     function setup_player()
@@ -156,7 +210,7 @@ class MainState extends State
         phys = player.add(new Physics2DBody(physics2d, Polygon.rectangle(100, 200, 16, 16, true), { name: 'Physics2DBody' }));
         player.pos.copy_from(phys.body.collider.position);
 
-        phys.set_topdown_configuration(100, 0);
+        phys.set_topdown_configuration(150, 0);
         phys.body.collision_response = false;
 
         var animation = player.add(new SpriteAnimation({ name: 'anim' }));
@@ -166,6 +220,7 @@ class MainState extends State
 
         var weapon = new Weapon(physics2d, phys, { name: 'Weapon' });
         weapon.bullet_layer = LAYER_PLAYER_BULLET;
+        weapon.scene = reset_scene;
         player.add(weapon);
 
         var dmg_recv = player.add(new DamageReceiver({ name: 'DamageReceiver' }));
@@ -173,6 +228,15 @@ class MainState extends State
         player_cap = player.add(new ShapeCapabilities(weapon, phys, dmg_recv, { name: 'ShapeCapabilities' }));
 
         player_inp = player.add(new PlayerInput(phys, player_cap, weapon, animation, { name: 'PlayerInput' }));
+        player_inp.input_enabled = true;
+    }
+
+    function reset_player()
+    {
+        phys.body.collider.position.set_xy(150, 300);
+        player.get('DamageReceiver').heal();
+        player.visible = true;
+        player_inp.input_enabled = true;
     }
 
     function setup_hud()
@@ -183,6 +247,8 @@ class MainState extends State
             texture: Luxe.resources.texture('assets/gfx/ui.png'),
             //batcher: global.ui
         });
+
+        hud.texture.filter_min = hud.texture.filter_mag = FilterType.nearest;
 
         var ratio = Luxe.screen.w / Luxe.screen.h;
 
@@ -203,20 +269,15 @@ class MainState extends State
             name: 'player-debug',
             title: 'player',
             parent: global.canvas,
-            x: Luxe.screen.w - 256, y: 0, w: 256, h: 384,
+            x: Luxe.screen.w - 256, y: 0, w: 256, h: 256,
             w_min: 256, h_min: 128,
             closable: false, collapsible: true, resizable: true,
         });
 
         win.register_watch(phys, 'proxy_pos', 0.1,  DebugWatcher.fmt_vec2d, DebugWatcher.set_vec2d);
-        win.register_watch(phys.body, 'velocity', 0.1, DebugWatcher.fmt_vec2d);
         win.register_watch(phys, 'move_speed', 1.0, DebugWatcher.fmt_vec2d_f, DebugWatcher.set_vec2d);
-        win.register_watch(phys.body, 'damp', 0.2, DebugWatcher.fmt_vec2d_f, DebugWatcher.set_vec2d);
-        win.register_watch(phys.body, 'layer', 1.0, null, DebugWatcher.set_int);
         win.register_watch(player_inp, 'bullet_speed', 1.0, null, DebugWatcher.set_float);
         win.register_watch(player_cap, 'current_shape', 0.1);
-        win.register_watch(player_inp, 'change_cooldown_cnt', 0.1);
-
 
         var win2 = new DebugWindow(watcher, global.layout, {
             name: 'world-debug',
@@ -227,10 +288,15 @@ class MainState extends State
             closable: false, collapsible: true, resizable: true,
         });
 
-        win2.register_watch(Luxe.camera, 'pos', 0.1, DebugWatcher.fmt_vec2d);
-        win2.register_watch(physics2d, 'paused', 1.0, null, DebugWatcher.set_bool);
+        win2.register_watch(Luxe.camera, 'pos', 0.1, DebugWatcher.fmt_vec2d, null, 'camera pos');
         win2.register_watch(physics2d, 'draw', 1.0, null, DebugWatcher.set_bool);
         win2.register_watch(physics2d, 'bodies', 0.2, function(v:Dynamic) { return Std.string(v == null ? '<null>' : Lambda.count(v)); } );
+        win2.register_watch(spawner, 'running', 0.5, null, DebugWatcher.set_bool, 'spawner run');
 
+    }
+
+    function cleanup()
+    {
+        Luxe.events.unlisten(msg_reset);
     }
 }

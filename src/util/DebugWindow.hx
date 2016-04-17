@@ -52,7 +52,7 @@ class DebugWindow extends Window
         ondestroy.remove(cleanup);
     }
 
-    public function register_watch(_object: Dynamic, _field: String, ?_rate: Float = 1.0, ?_format: FormatCallback = null, ?_setter: SetterCallback = null)
+    public function register_watch(_object: Dynamic, _field: String, ?_rate: Float = 1.0, ?_format: FormatCallback = null, ?_setter: SetterCallback = null, ?_label: String = null)
     {
         var watch_item = watcher.register_watch(
             _object, _field,
@@ -61,8 +61,11 @@ class DebugWindow extends Window
             _setter
         );
 
+        var label = _label;
+        if (label == null) label = _field;
+
         // a bit messy - but we need to determine to render a text edit or a label later and create the correct callbacks
-        create_list_item(_field, watch_item);
+        create_list_item(label, watch_item);
     }
 
     function create_list_item(_name: String, _watch: WatchedValue)

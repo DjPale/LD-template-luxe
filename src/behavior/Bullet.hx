@@ -6,7 +6,7 @@ class Bullet extends Component
 {
     function check_bounds()
     {
-        if (entity == null) return;
+        if (entity == null || entity.destroyed) return;
 
         if (entity.pos.x < 0 || entity.pos.x > Luxe.camera.size.x || entity.pos.y < 0 || entity.pos.y > Luxe.camera.size.y)
         {

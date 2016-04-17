@@ -88,7 +88,7 @@ class MenuState extends State
         txt1 = new Text({
             name: 'Title',
             font: global.font,
-            text: 'SPACE-SHIFT',
+            text: 'SPACE SHIFT',
             sdf: false,
             align : TextAlign.center,
             align_vertical : TextAlign.center,
@@ -101,7 +101,7 @@ class MenuState extends State
         txt2 = new Text({
             name: 'Title',
             font: global.font,
-            text: 'SPACE-TO-START',
+            text: 'SPACE TO START',
             sdf: false,
             align : TextAlign.center,
             align_vertical : TextAlign.center,

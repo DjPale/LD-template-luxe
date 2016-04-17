@@ -1,21 +1,27 @@
+import luxe.Color;
 import luxe.Input;
 import luxe.States;
 import luxe.Vector;
+import luxe.Text;
 
 import mint.Canvas;
 import mint.render.luxe.LuxeMintRender;
 import mint.layout.margins.Margins;
 
+import phoenix.BitmapFont;
+
 typedef GlobalData = {
     states: States,
     ui: phoenix.Batcher,
     canvas: Canvas,
-    layout: Margins
+    layout: Margins,
+    font: BitmapFont
 };
+
 
 class Main extends luxe.Game
 {
-    var global : GlobalData = { states: null, ui: null, canvas: null, layout: null };
+    var global : GlobalData = { states: null, ui: null, canvas: null, layout: null, font: null };
 
     override function config(config:luxe.AppConfig) : luxe.AppConfig
     {
@@ -50,6 +56,8 @@ class Main extends luxe.Game
         });
 
         setup_canvas();
+
+        global.font = Luxe.resources.font('assets/fonts/font.fnt');
 
         // Set up batchers, states etc.
         global.states = new States({ name: 'states' });

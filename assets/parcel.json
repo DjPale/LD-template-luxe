@@ -12,6 +12,9 @@
     "shaders" : [
         { "id" : "nmaplit", "vert_id" : "default", "frag_id" : "assets/frag.nmaplit.glsl" }
     ],
+    "fonts": [
+        { "id" : "assets/fonts/font.fnt" }
+    ],
     "sounds" : [
         { "id" : "assets/sfx/CK_Blaster_Shot-226.wav", "name" : "shot", "is_stream" : true }
     ],

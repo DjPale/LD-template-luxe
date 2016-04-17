@@ -28,18 +28,18 @@ class EnemySpawner
 
     public var spawn_blocks : Array<Array<String>> = [
         [
-        "   0       0   ",
-        "     1   1     ",
+        "2  0       0  2",
+        " 0   1   1   0 ",
         "0      2      0"
         ],
         [
-        "  0        0   ",
+        "  0  1   1 0   ",
         " 2     0     2 ",
         "    2     2    ",
         ]
     ];
 
-    public var spawn_marks : String = "0x1xx0xx1x1";
+    public var spawn_marks : String = "0x1x0x1x1";
 
     var spawn_mark_idx = 0;
 
@@ -159,8 +159,8 @@ class EnemySpawner
 
         var weapon = sprite.add(new Weapon(physics2d, phys, sound_player, { name: 'Weapon' }));
         weapon.bullet_layer = bullet_layer;
-        weapon.fire_rate = 2;
-        weapon.bullet_speed = 100;
+        weapon.fire_rate = 0.5;
+        weapon.bullet_speed = 150;
         weapon.scene = scene;
 
         var cap = new ShapeCapabilities(weapon, phys, dmg_recv, { name: 'ShapeCapabilities' });

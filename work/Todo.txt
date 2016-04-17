@@ -1,0 +1,47 @@
+
+## Tweaking (espie)
+
+- Def-mode
+    Invulnerable
+    Lasts max 3 secs
+    No shootz!
+    Slower
+
+- Agile-mode
+    No change
+
+- Attack
+    2x Weapons - one from each wing
+    Higher ROF
+    No damage increase
+
+- Composite
+
+- Steering scale
+
+- Minimap
+
+
+- Moving patterns
+
+- Rotating enemies
+
+## c2
+    - Sfx (Explosion - player + enemies)
+
+    - Start Menu - credits
+
+    - GUI buttons update in main game
+
+    - Particle fx
+        - Explosion
+        - Afterburn
+
+    - Music
+
+    - Starfield 2.0
+
+    - Level design
+
+    - Transitions
+        Level

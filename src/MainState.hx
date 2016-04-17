@@ -79,13 +79,6 @@ class MainState extends State
         setup();
     }
 
-    override function onleave<T>(ignored:T)
-    {
-        trace('enter state ' + this.name);
-
-        cleanup();
-    }
-
     override function onmousemove(event: luxe.MouseEvent)
     {
     }

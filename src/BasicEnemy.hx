@@ -59,6 +59,8 @@ class BasicEnemy extends Component
 
     override function update(dt: Float)
     {
+        if (entity == null || entity.destroyed) return;
+
         ai_step(dt);
 
         if (entity.pos.y > Luxe.camera.size.y)
@@ -81,8 +83,13 @@ class BasicEnemy extends Component
     {
         if (weapon != null && cap_type == ShapeCapabilities.SHAPE_ATTACK)
         {
-            var dir = Vector.Subtract(player_body.proxy_pos, entity.pos);
-            weapon.fire(dir);
+            var player_pos = player_body.proxy_pos;
+
+            if (player_pos != null)
+            {
+                var dir = Vector.Subtract(player_pos, entity.pos);
+                weapon.fire(dir);
+            }
         }
 
         // TODO: temp!

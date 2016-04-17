@@ -10,6 +10,7 @@ import luxe.components.sprite.SpriteAnimation;
 import physics2d.PhysicsEngine2D;
 import physics2d.components.Physics2DBody;
 
+import behavior.DamageDealer;
 import behavior.DamageReceiver;
 
 import phoenix.Texture;
@@ -152,6 +153,9 @@ class EnemySpawner
         var dmg_recv = new DamageReceiver(sound_player, { name: 'DamageReceiver' });
         dmg_recv.hitpoints = 2;
         sprite.add(dmg_recv);
+
+        // var dmg_deal = new DamageDealer({ name: 'DamageDealer' });
+        // sprite.add(dmg_deal);
 
         var weapon = sprite.add(new Weapon(physics2d, phys, sound_player, { name: 'Weapon' }));
         weapon.bullet_layer = bullet_layer;

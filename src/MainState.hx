@@ -189,6 +189,10 @@ class MainState extends State
 
         setup_debug();
 
+        spawner.reset();
+        spawner.run();
+
+        msg_reset = Luxe.events.listen('LevelReset', reset_level_delayed);
     }
 
     function setup_player()
@@ -202,18 +206,13 @@ class MainState extends State
             texture: image
         });
 
-        var animation = player.add(new SpriteAnimation({ name: 'anim' }));
-        animation.add_from_json_object(Luxe.resources.json('assets/player_anim.json').asset.json);
-        animation.animation = 'idle';
-        animation.play();
-
         phys = player.add(new Physics2DBody(physics2d, Polygon.rectangle(100, 200, 16, 16, true), { name: 'Physics2DBody' }));
         player.pos.copy_from(phys.body.collider.position);
 
         phys.set_topdown_configuration(150, 0);
         phys.body.collision_response = false;
 
-        var animation = player.add(new SpriteAnimation({ name: 'anim' }));
+        var animation = player.add(new SpriteAnimation({ name: 'SpriteAnimation' }));
         animation.add_from_json_object(Luxe.resources.json('assets/player_anim.json').asset.json);
         animation.animation = 'attack_default';
         animation.play();
@@ -224,6 +223,8 @@ class MainState extends State
         player.add(weapon);
 
         var dmg_recv = player.add(new DamageReceiver(sound_player, { name: 'DamageReceiver' }));
+
+        //player.add(new DamageDealer({ name: 'DamageDealer' }));
 
         player_cap = player.add(new ShapeCapabilities(weapon, phys, dmg_recv, { name: 'ShapeCapabilities' }));
 
@@ -237,6 +238,10 @@ class MainState extends State
         player.get('DamageReceiver').heal();
         player.visible = true;
         player_inp.input_enabled = true;
+        player_cap.apply_abilities(0);
+
+        var anim = player.get('SpriteAnimation');
+        player_inp.player_state = 'attack';
     }
 
     function setup_hud()
@@ -278,6 +283,7 @@ class MainState extends State
         win.register_watch(phys, 'move_speed', 1.0, DebugWatcher.fmt_vec2d_f, DebugWatcher.set_vec2d);
         win.register_watch(player_inp, 'bullet_speed', 1.0, null, DebugWatcher.set_float);
         win.register_watch(player_cap, 'current_shape', 0.1);
+        win.register_watch(player.get('DamageReceiver'), 'hitpoints', 0.1);
 
         var win2 = new DebugWindow(watcher, global.layout, {
             name: 'world-debug',
@@ -297,6 +303,11 @@ class MainState extends State
 
     function cleanup()
     {
-        Luxe.events.unlisten(msg_reset);
+        //Luxe.events.unlisten(msg_reset);
+        player.visible = false;
+        player_inp.input_enabled = false;
+
+        reset_scene.empty();
+        spawner.running = false;
     }
 }

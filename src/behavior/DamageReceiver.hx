@@ -33,21 +33,26 @@ class DamageReceiver extends Component
         hitpoints = max_hitpoints;
     }
 
-    function ondamaged(e: DamageDealerParams)
+    public function deal(source: Entity, dmg: Int)
     {
-        trace('damage from ${e.source.entity.name}');
+        trace('$dmg damage from ${source.name}');
 
         if (entity.name == 'player') {
             sound_player.play('impact');
         }
 
-        hitpoints -= e.source.damage;
+        hitpoints -= dmg;
 
         if (hitpoints <= 0)
         {
             hitpoints = 0;
             entity.events.fire(message);
         }
+    }
+
+    function ondamaged(e: DamageDealerParams)
+    {
+        deal(e.source.entity, e.source.damage);
     }
 
     override function ondestroy()

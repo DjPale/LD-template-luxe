@@ -85,6 +85,7 @@ class Weapon extends Component
 
         var bul_dmg = bullet.add(new DamageDealer({ name: 'DamageDealer' }));
         bul_dmg.damage = damage;
+        bul_dmg.destroy_on_impact = true;
 
         bullet.add(new Bullet());
 

@@ -110,7 +110,7 @@ class Physics2DBody extends luxe.Component
 
     public function get_proxy_pos() : Vector
     {
-        return entity.pos;
+        return (entity != null && entity.transform != null ? entity.pos : null);
     }
 
     public function move(x: Float, y: Float)

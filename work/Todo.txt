@@ -27,10 +27,6 @@
 - Rotating enemies
 
 ## c2
-    - Start Menu - credits
-
-    - GUI buttons update in main game
-
     - Particle fx
         - Explosion
         - Afterburn

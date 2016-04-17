@@ -15,8 +15,9 @@ class MenuState extends State
     var global : GlobalData;
     var batcher : phoenix.Batcher;
 
-    var txt1 : Text;
-    var txt2 : Text;
+    var txt_logo : Text;
+    var txt_start : Text;
+    var txt_credits : Text;
 
     var input_disable : Bool = false;
 
@@ -55,30 +56,34 @@ class MenuState extends State
     function start_game()
     {
         input_disable = true;
-        Actuate.stop(txt2.color);
-        txt2.color.a = 0;
-        Actuate.tween(txt2.color, 0.2, { a: 1 }).repeat(5).reflect().onComplete(fade_out);
+        Actuate.stop(txt_start.color);
+        txt_start.color.a = 0;
+        Actuate.tween(txt_start.color, 0.5, { a: 1 }).reflect().onComplete(fade_out);
     }
 
     function cleanup()
     {
-        Actuate.stop(txt1.color);
-        Actuate.stop(txt2.color);
+        Actuate.stop(txt_logo.color);
+        Actuate.stop(txt_start.color);
+        Actuate.stop(txt_credits.color);
 
-        txt1.destroy();
-        txt2.destroy();
+        txt_logo.destroy();
+        txt_start.destroy();
+        txt_credits.destroy();
     }
 
     function fade_out(_)
     {
-        txt2.color.a = 0;
-        txt1.color.a = 1;
-        Actuate.tween(txt1.color, 1, { a: 0 }).onComplete(function(_) { global.states.set("MainState"); });
+        txt_start.color.a = 0;
+        txt_logo.color.a = 1;
+        Actuate.tween(txt_credits.color, 1, { a: 0 });
+        Actuate.tween(txt_logo.color, 1, { a: 0 }).onComplete(function(_) { global.states.set("MainState"); });
     }
 
     function ready_steady(_)
     {
-        Actuate.tween(txt2.color, 0.5, { a: 1 }).repeat().reflect();
+        Actuate.tween(txt_credits.color, 0.5, { a: 1 }).reflect();
+        Actuate.tween(txt_start.color, 0.5, { a: 1 }).reflect();
 
         input_disable = false;
     }
@@ -87,20 +92,30 @@ class MenuState extends State
     {
         input_disable = true;
 
-        txt1 = new Text({
-            name: 'Title',
+        txt_logo = new Text({
+            name: 'Logo',
             font: global.font,
             text: 'SPACE SHIFT',
             sdf: false,
             align : TextAlign.center,
             align_vertical : TextAlign.center,
             point_size: 24,
-            pos: new Vector(Luxe.camera.size.x / 2, 100)
+            pos: new Vector(Luxe.camera.size.x / 2, -100)
         });
 
-        txt1.color.a = 0;
+        txt_credits = new Text({
+            name: 'Credits',
+            font: global.font,
+            text: 'PRESS C FOR CREDITS',
+            sdf: false,
+            align : TextAlign.center,
+            align_vertical : TextAlign.center,
+            point_size: 8,
+            pos: new Vector(Luxe.camera.size.x / 2, 225)
+        });
+        txt_credits.color.a = 0;
 
-        txt2 = new Text({
+        txt_start = new Text({
             name: 'Title',
             font: global.font,
             text: 'SPACE TO START',
@@ -110,9 +125,8 @@ class MenuState extends State
             point_size: 8,
             pos: new Vector(Luxe.camera.size.x / 2, 250)
         });
+        txt_start.color.a = 0;
 
-        txt2.color.a = 0;
-
-        Actuate.tween(txt1.color, 2, { a: 1 }).onComplete(ready_steady);
+        Actuate.tween(txt_logo.pos, 0.5, { x: Luxe.camera.size.x / 2, y: 100 }).onComplete(ready_steady);
     }
 }

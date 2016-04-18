@@ -1,3 +1,4 @@
+import luxe.Color;
 import luxe.States;
 import luxe.Mesh;
 import luxe.Text;
@@ -57,6 +58,7 @@ class MainState extends State
     var reset_scene : Scene;
 
     var msg_reset : String;
+    var mouse: Vector;
 
     public var has_done_init : Bool = false;
 
@@ -71,6 +73,8 @@ class MainState extends State
 
         global = _global;
         batcher = _batcher;
+
+        mouse = new Vector();
 
         physics2d = Luxe.physics.add_engine(PhysicsEngine2D);
     }
@@ -91,6 +95,7 @@ class MainState extends State
 
     override function onmousemove(event: luxe.MouseEvent)
     {
+        mouse.set_xy(event.x,event.y);
     }
 
     override function onkeydown(event: KeyEvent)

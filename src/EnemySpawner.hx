@@ -84,7 +84,7 @@ class EnemySpawner
     ];
 
     var spawn_marks : Array<String> = [
-        "x7x1x2x3x4x5x6x7"
+        "x0x1x2x3x4x5x6x7"
     ];
 
     public var level_idx(default,null) : Int = 0;

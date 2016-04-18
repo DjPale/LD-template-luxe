@@ -42,9 +42,12 @@ class MainState extends State
     var player : Sprite;
     var player_inp : PlayerInput;
     var player_cap : ShapeCapabilities;
-    var player_hp_text : Text;
+    var player_dmg : DamageReceiver;
 
     var hud : Sprite;
+    var score_txt : Text;
+    var hull_txt : Text;
+    var lvl_txt : Text;
     var background : Sprite;
 
     var dispatcher : MessageDispatcher;
@@ -114,6 +117,8 @@ class MainState extends State
 
     override function update(dt: Float)
     {
+        update_hud();
+
         spawner.update(dt);
 
         background.uv.y -= 40 * dt;
@@ -212,9 +217,11 @@ class MainState extends State
         setup_debug();
 
         spawner.reset();
-        spawner.run();
+        //spawner.run();
 
         msg_reset = Luxe.events.listen('LevelReset', reset_level_delayed);
+
+        spawner.spawn_composite(new Vector(100, 200));
 
         has_done_init = true;
     }
@@ -246,11 +253,11 @@ class MainState extends State
         weapon.scene = reset_scene;
         player.add(weapon);
 
-        var dmg_recv = player.add(new DamageReceiver(sound_player, { name: 'DamageReceiver' }));
+        player_dmg = player.add(new DamageReceiver(sound_player, { name: 'DamageReceiver' }));
 
         //player.add(new DamageDealer({ name: 'DamageDealer' }));
 
-        player_cap = player.add(new ShapeCapabilities(weapon, phys, dmg_recv, { name: 'ShapeCapabilities' }));
+        player_cap = player.add(new ShapeCapabilities(weapon, phys, player_dmg, { name: 'ShapeCapabilities' }));
 
         player_inp = player.add(new PlayerInput(phys, player_cap, weapon, animation, sound_player, { name: 'PlayerInput' }));
         player_inp.auto_switch_on(3.0);
@@ -277,7 +284,36 @@ class MainState extends State
             name: 'hud',
             pos: new Vector(Luxe.camera.size.x / 2, Luxe.camera.size.y - 16),
             texture: Luxe.resources.texture('assets/gfx/ui.png'),
+            depth: 100
             //batcher: global.ui
+        });
+
+        score_txt = new Text({
+            name: 'score_txt',
+            font: global.font,
+            sdf: false,
+            pos: new Vector(10),
+            point_size: 8,
+            text: 'SCORE 0',
+            visible: false
+        });
+
+        hull_txt = new Text({
+            name: 'hull_txt',
+            font: global.font,
+            sdf: false,
+            pos: new Vector(Luxe.camera.size.x - 100),
+            point_size: 8,
+            text: 'HULL 1'
+        });
+
+        lvl_txt = new Text({
+            name: 'lvl_txt',
+            font: global.font,
+            sdf: false,
+            pos: new Vector(Luxe.camera.size.x - 40, 40),
+            point_size: 8,
+            text: 'L1'
         });
 
         hud.texture.filter_min = hud.texture.filter_mag = FilterType.nearest;
@@ -293,6 +329,12 @@ class MainState extends State
     		});
 
     	background.texture.clamp_s = background.texture.clamp_t = phoenix.Texture.ClampType.repeat;
+    }
+
+    function update_hud()
+    {
+        lvl_txt.text = 'L' + (spawner.level_idx + 1);
+        hull_txt.text = 'HULL ' + player_dmg.hitpoints;
     }
 
     function setup_debug()
@@ -333,6 +375,9 @@ class MainState extends State
         background.visible = visible;
         hud.visible = visible;
         global.canvas.visible = visible;
+        score_txt.visible = visible;
+        lvl_txt.visible = visible;
+        hull_txt.visible = visible;
     }
 
     function cleanup()

@@ -28,6 +28,26 @@ class EnemySpawner
 
     var spawn_blocks : Array<Array<String>> = [
         [
+        " 2           2 ",
+        "               ",
+        "       2       ",
+        ],
+        [
+        " 1           1 ",
+        "               ",
+        "       1       ",
+        ],
+        [
+        " 0           0 ",
+        "               ",
+        "       0       ",
+        ],
+        [
+        "   11      11  ",
+        "    11   11    ",
+        "     11111     ",
+        ],
+        [
         "2  0       0  2",
         " 0   1   1   0 ",
         "0      2      0"
@@ -36,6 +56,16 @@ class EnemySpawner
         "  0  1   1 0   ",
         " 2     0     2 ",
         "    2     2    ",
+        ],
+        [
+        "0   0   0   0  ",
+        " 0   0   0   0 ",
+        "  0   0   0   0",
+        ],
+        [
+        "0 0 0 0 0 0 0 0",
+        " 0 0 0 0 0 0 0 ",
+        "0 0 0 0 0 0 0 0",
         ]
     ];
 
@@ -44,11 +74,17 @@ class EnemySpawner
         "22",
         "1",
         "0"
-        ]
+        ],
+        [
+        "0",
+        "010",
+        "0"
+        ],
+
     ];
 
     var spawn_marks : Array<String> = [
-        "x0x1x0x1x1"
+        "x7x1x2x3x4x5x6x7"
     ];
 
     public var level_idx(default,null) : Int = 0;

@@ -20,7 +20,8 @@
         { "id" : "assets/sfx/impact.wav", "name" : "impact" },
         { "id" : "assets/sfx/transform.wav", "name" : "transform" },
         { "id" : "assets/sfx/enemy_explodes.wav", "name" : "enemy_explodes" },
-        { "id" : "assets/sfx/player_explodes.wav", "name" : "player_explodes" }
+        { "id" : "assets/sfx/player_explodes.wav", "name" : "player_explodes" },
+        { "id" : "assets/sfx/music.mp3", "name" : "music" }
     ],
     "json" : [
         { "id" : "assets/prefabs.json" },

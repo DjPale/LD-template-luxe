@@ -20,6 +20,7 @@ class MenuState extends State
     var txt_credits : Text;
 
     var input_disable : Bool = false;
+    var sound_player : SoundPlayer;
 
     public function new(_global:GlobalData, _batcher:phoenix.Batcher)
     {
@@ -90,6 +91,10 @@ class MenuState extends State
 
     function setup()
     {
+        sound_player = new SoundPlayer();
+
+        sound_player.play_music();
+
         input_disable = true;
 
         txt_logo = new Text({
@@ -106,12 +111,12 @@ class MenuState extends State
         txt_credits = new Text({
             name: 'Credits',
             font: global.font,
-            text: 'PRESS C FOR CREDITS',
+            text: 'DIGITAL APATHY\nCODE - DJ_PALE\nGFX AND ASS.CODE - PLINK\nMUSIC - SKURK',
             sdf: false,
             align : TextAlign.center,
             align_vertical : TextAlign.center,
             point_size: 8,
-            pos: new Vector(Luxe.camera.size.x / 2, 225)
+            pos: new Vector(Luxe.camera.size.x / 2, 300)
         });
         txt_credits.color.a = 0;
 
@@ -122,8 +127,8 @@ class MenuState extends State
             sdf: false,
             align : TextAlign.center,
             align_vertical : TextAlign.center,
-            point_size: 8,
-            pos: new Vector(Luxe.camera.size.x / 2, 250)
+            point_size: 10,
+            pos: new Vector(Luxe.camera.size.x / 2, 200)
         });
         txt_start.color.a = 0;
 

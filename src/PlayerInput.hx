@@ -34,10 +34,18 @@ class PlayerInput extends luxe.Component
     var msg_dead : String;
     var msg_col : String;
     var sound_player : SoundPlayer;
+    var afterburner : AfterburnerComponent;
 
     var ui_shapes : Map<Int, Sprite>;
 
-    public function new(_phys: Physics2DBody, _cap: ShapeCapabilities, _weapon: Weapon, _animation: SpriteAnimation, _sound_player: SoundPlayer, ?_options: luxe.options.ComponentOptions)
+    public function new(
+        _phys: Physics2DBody,
+        _cap: ShapeCapabilities,
+        _weapon: Weapon,
+        _animation: SpriteAnimation,
+        _sound_player: SoundPlayer,
+        _afterburner: AfterburnerComponent,
+        ?_options: luxe.options.ComponentOptions)
     {
         super(_options);
 
@@ -46,6 +54,7 @@ class PlayerInput extends luxe.Component
         weapon = _weapon;
         animation = _animation;
         sound_player = _sound_player;
+        afterburner = _afterburner;
     }
 
     override function init()
@@ -197,10 +206,10 @@ class PlayerInput extends luxe.Component
     {
         var x = 0;
         var y = 0;
-
         var can_swith = (auto_switch > 0);
-
         var player_direction = 'default';
+
+        afterburner.particles.stop();
 
         if (input_enabled)
         {
@@ -239,6 +248,7 @@ class PlayerInput extends luxe.Component
             if (Luxe.input.inputdown("up"))
             {
                 y = -1;
+                afterburner.particles.start();
             }
             else if (Luxe.input.inputdown("down"))
             {

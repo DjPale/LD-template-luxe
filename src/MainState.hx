@@ -221,7 +221,7 @@ class MainState extends State
         setup_debug();
 
         spawner.reset();
-        //spawner.run();
+        spawner.run();
 
         msg_reset = Luxe.events.listen('LevelReset', reset_level_delayed);
 
@@ -285,9 +285,11 @@ class MainState extends State
 
         //player.add(new DamageDealer({ name: 'DamageDealer' }));
 
+        var afterburner = player.add(new AfterburnerComponent());
+
         player_cap = player.add(new ShapeCapabilities(weapon, phys, player_dmg, { name: 'ShapeCapabilities' }));
 
-        player_inp = player.add(new PlayerInput(phys, player_cap, weapon, animation, sound_player, { name: 'PlayerInput' }));
+        player_inp = player.add(new PlayerInput(phys, player_cap, weapon, animation, sound_player, afterburner, { name: 'PlayerInput' }));
         player_inp.auto_switch_on(3.0);
         player_inp.input_enabled = true;
     }

@@ -7,6 +7,7 @@ class SoundPlayer {
     var sfx_transform: AudioResource;
     var sfx_enemy_explodes: AudioResource;
     var sfx_player_explodes: AudioResource;
+    var sfx_music: AudioResource;
     var master_volume_modifier: Float = 0.25;
 
     public function new() {
@@ -15,8 +16,12 @@ class SoundPlayer {
         sfx_transform = Luxe.resources.audio('assets/sfx/transform.wav');
         sfx_enemy_explodes = Luxe.resources.audio('assets/sfx/enemy_explodes.wav');
         sfx_player_explodes = Luxe.resources.audio('assets/sfx/player_explodes.wav');
+        sfx_music = Luxe.resources.audio('assets/sfx/music.mp3');
     }
 
+    public function play_music() {
+        Luxe.audio.loop(sfx_music.source, master_volume_modifier);
+    }
 
     public function play(id: String, ?volume: Float) {
 

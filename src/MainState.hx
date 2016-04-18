@@ -49,7 +49,6 @@ class MainState extends State
     var score_txt : Text;
     var hull_txt : Text;
     var lvl_txt : Text;
-    var background : Sprite;
 
     var dispatcher : MessageDispatcher;
     var factory : TiledMapObjectFactory;
@@ -144,8 +143,6 @@ class MainState extends State
         update_hud();
 
         spawner.update(dt);
-
-        background.uv.y -= 40 * dt;
     }
 
     function start_level()
@@ -229,6 +226,8 @@ class MainState extends State
 
         sound_player = new SoundPlayer();
 
+        setup_background();
+
         setup_player();
 
         spawner = new EnemySpawner(physics2d, player, sound_player);
@@ -241,13 +240,37 @@ class MainState extends State
         setup_debug();
 
         spawner.reset();
-        //spawner.run();
+        spawner.run();
 
         msg_reset = Luxe.events.listen('LevelReset', reset_level_delayed);
 
         spawner.spawn_composite(new Vector(100, 200));
 
         has_done_init = true;
+    }
+
+    function setup_background() {
+
+        new Sprite({
+            name : 'background',
+            size : new Vector(Luxe.screen.w, Luxe.screen.h),
+            color : new Color(0, 0, 0, 1),
+            pos : new Vector(0, 0),
+            depth: -10
+        });
+
+        var star : Sprite;
+        for( i in 0...150 ) {
+
+            star = new Sprite({
+                name : 'star'+i,
+                size : new Vector(1, 1),
+                color : new Color(1, 1, 1, 1),
+                pos : new Vector(Luxe.utils.random.int(0, Luxe.screen.w), Luxe.utils.random.int(0, Luxe.screen.h))
+            });
+
+            star.add(new StarComponent());
+        }
     }
 
     function setup_player()
@@ -281,9 +304,11 @@ class MainState extends State
 
         //player.add(new DamageDealer({ name: 'DamageDealer' }));
 
+        var afterburner = player.add(new AfterburnerComponent());
+
         player_cap = player.add(new ShapeCapabilities(weapon, phys, player_dmg, { name: 'ShapeCapabilities' }));
 
-        player_inp = player.add(new PlayerInput(phys, player_cap, weapon, animation, sound_player, { name: 'PlayerInput' }));
+        player_inp = player.add(new PlayerInput(phys, player_cap, weapon, animation, sound_player, afterburner, { name: 'PlayerInput' }));
         player_inp.auto_switch_on(3.0);
         player_inp.input_enabled = true;
     }
@@ -343,16 +368,6 @@ class MainState extends State
         hud.texture.filter_min = hud.texture.filter_mag = FilterType.nearest;
 
         var ratio = Luxe.screen.w / Luxe.screen.h;
-
-    	background = new Sprite({
-    		name: 'background',
-    		texture: Luxe.resources.texture('assets/background.png'),
-    		size: new Vector(Luxe.screen.w, Luxe.screen.w / ratio),
-    		centered: false,
-    		depth: -1
-    		});
-
-    	background.texture.clamp_s = background.texture.clamp_t = phoenix.Texture.ClampType.repeat;
     }
 
     function update_hud()
@@ -396,7 +411,6 @@ class MainState extends State
 
     function show_shit(visible: Bool)
     {
-        background.visible = visible;
         hud.visible = visible;
         global.canvas.visible = visible;
         score_txt.visible = visible;

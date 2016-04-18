@@ -46,8 +46,6 @@ x Moving patterns
 
     - Music
 
-    - Starfield 2.0
-
     - Level design
         Moar waves og levels
 

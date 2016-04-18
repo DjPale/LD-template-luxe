@@ -113,6 +113,17 @@ class MainState extends State
                 global.states.set('MenuState');
             }
         }
+        if (event.keycode == Key.key_s)
+        {
+            if (!spawner.running)
+            {
+                spawner.run();
+            }
+            else
+            {
+                spawner.running = false;
+            }
+        }
     }
 
     override function update(dt: Float)

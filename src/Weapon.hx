@@ -44,6 +44,11 @@ class Weapon extends Component
         if (fire_rate_cnt > 0) fire_rate_cnt -= dt;
     }
 
+    public function can_fire()
+    {
+        return (fire_rate_cnt <= 0);
+    }
+
     public function fire(direction: Vector, ?_ignore_cooldown: Bool = false, ?_ofs: Vector = null) : Bool
     {
         if (!_ignore_cooldown && fire_rate_cnt > 0) return false;
@@ -81,7 +86,7 @@ class Weapon extends Component
         direction.normalize();
 
         bullet_phys.move_speed.set_xy(direction.x * bullet_speed, direction.y * bullet_speed);
-        bullet_phys.move_speed.add(phys.body.velocity);
+        if (phys != null) bullet_phys.move_speed.add(phys.body.velocity);
 
         bullet_phys.body.apply_velocity(bullet_phys.move_speed.x, bullet_phys.move_speed.y);
 

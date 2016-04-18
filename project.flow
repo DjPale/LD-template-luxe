@@ -25,7 +25,7 @@
         mint : '*',
         hscript : '*'
       },
-      defines : ['hscriptPos'],
+      defines : ['hscriptPos', 'no_debug_console'],
       flags: ['-dce std']
     },
 

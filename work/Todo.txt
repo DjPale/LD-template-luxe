@@ -18,11 +18,11 @@ x Player Spawn time decrease
 
 x Auto-rotate abilities flag
 
-- HP Text
+x HP Text
 
 - Score Text
 
-- Composite
+x Composite
 
 - Steering scale
 
@@ -35,7 +35,7 @@ x Auto-rotate abilities flag
 
 - Minimap
 
-- Moving patterns
+x Moving patterns
 
 - Rotating enemies
 

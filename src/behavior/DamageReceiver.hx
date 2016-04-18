@@ -49,7 +49,7 @@ class DamageReceiver extends Component
         if (hitpoints <= 0)
         {
             hitpoints = 0;
-            entity.events.fire(message);
+            entity.events.fire(message, entity);
         }
     }
 

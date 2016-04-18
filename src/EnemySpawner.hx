@@ -215,10 +215,18 @@ class EnemySpawner
 
         var parent_enemy = new Entity({
             name: 'enemy.composite',
-            pos: spos
+            pos: spos,
+            origin: new Vector(10, 10)
         });
 
-        var comp_en = new CompositeEnemy(player,  sound_player, { name: 'CompositeEnemy' });
+        var weapon = new Weapon(physics2d,  null, sound_player);
+        weapon.bullet_layer = bullet_layer;
+        weapon.fire_rate = 1;
+        weapon.bullet_speed = 150;
+        weapon.scene = scene;
+        parent_enemy.add(weapon);
+
+        var comp_en = new CompositeEnemy(player,  weapon, sound_player, { name: 'CompositeEnemy' });
         parent_enemy.add(comp_en);
 
         // max height
@@ -230,7 +238,7 @@ class EnemySpawner
             if (row.length > max_w) max_w = row.length;
         }
 
-        parent_enemy.origin.set_xy((max_w * en_sz) / 2, (max_h * en_sz) / 4);
+        parent_enemy.origin.set_xy((max_w * en_sz) / 2, (max_h * en_sz) / 2);
 
         for (row_idx in 0...max_h)
         {
@@ -246,11 +254,30 @@ class EnemySpawner
                     parent: parent_enemy,
                     size: new Vector(en_sz, en_sz),
                     texture: Luxe.resources.texture('assets/gfx/enemies.png'),
+                    centered: true,
                     pos: new Vector(
                         (((max_w - row_l) * en_sz) / 2) + (idx * en_sz),
                         ((max_h * en_sz) / 2) - (row_idx * en_sz)
                     ),
                 });
+
+                part.transform.world.auto_decompose = true;
+
+                var dmg_recv = new DamageReceiver(sound_player, { name: 'DamageReceiver' });
+                dmg_recv.hitpoints = 1;
+                part.add(dmg_recv);
+
+                var phys = part.add(new Physics2DBody(
+                    physics2d,
+                    new Circle(spos.x, spos.y, en_sz - 10)
+                ));
+
+                phys.set_topdown_configuration(0, 0);
+                phys.collision_only = true;
+                phys.body.layer = enemy_layer;
+                phys.body.collision_response = false;
+
+                parent_enemy.pos.copy_from(spos);
 
                 trace('spawn part ${part.name} of composite ${parent_enemy.name}');
 

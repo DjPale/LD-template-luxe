@@ -129,6 +129,14 @@ class MainState extends State
                 spawner.running = false;
             }
         }
+        if (event.keycode == Key.key_i)
+        {
+            player_dmg.invulnerable = !player_dmg.invulnerable;
+        }
+        if (event.keycode == Key.key_c)
+        {
+            spawner.spawn_composite(new Vector(150, -16));
+        }
     }
 
     override function update(dt: Float)

@@ -73,7 +73,7 @@ class PlayerInput extends luxe.Component
                 color: new Color(0, 0, 0, 0),
                 size: new Vector(78, 32),
                 centered: false,
-                depth: 1
+                depth: 101
             }),
             1 =>
             new Sprite({
@@ -82,7 +82,7 @@ class PlayerInput extends luxe.Component
                 color: new Color(0, 0, 0, 0.75),
                 size: new Vector(78, 32),
                 centered: false,
-                depth: 1
+                depth: 101
             }),
             2 =>
             new Sprite({
@@ -91,7 +91,7 @@ class PlayerInput extends luxe.Component
                 color: new Color(0, 0, 0, 0.75),
                 size: new Vector(78, 32),
                 centered: false,
-                depth: 1
+                depth: 101
             })
         ];
     }
@@ -113,7 +113,7 @@ class PlayerInput extends luxe.Component
             {
 
                 var next_shape = ((cap.current_shape + 1) % 3);
-                trace('try to change to ' + next_shape);
+                //trace('try to change to ' + next_shape);
                 change_shape(next_shape);
 
                 for(shape in ui_shapes) {
@@ -135,7 +135,7 @@ class PlayerInput extends luxe.Component
 
     function oncollision(e: Physics2DBodyCollisionParams)
     {
-        if (StringTools.startsWith(e.target.name, 'enemy'))
+        if (StringTools.startsWith(e.target.name, 'enemy') || StringTools.startsWith(e.target.name, 'part'))
         {
             e.target.get('DamageReceiver').deal(entity, 1);
             dmg_recv.deal(e.target, 1);

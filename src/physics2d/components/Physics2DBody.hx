@@ -22,6 +22,7 @@ class Physics2DBody extends luxe.Component
 
     public var body : Physics2DRigidBody;
     public var move_speed : Vector = new Vector(200.0, 100.0);
+    public var collision_only : Bool = false;
 
     public var jump_times : Int = 1;
     public var jump_pause : Float = 0.05;
@@ -64,7 +65,19 @@ class Physics2DBody extends luxe.Component
 
     override public function update(dt: Float)
     {
-        if (body != null && body.collider != null) this.pos.copy_from(body.collider.position);
+        if (body != null && body.collider != null)
+        {
+            if (collision_only)
+            {
+                var w = entity.transform.world.pos;
+                body.collider.position.set_xy(w.x + 8, w.y + 8);
+                body.collider.rotation = entity.rotation.toeuler().z;
+            }
+            else
+            {
+                pos.copy_from(body.collider.position);
+            }
+        }
 
         check_state(dt);
     }

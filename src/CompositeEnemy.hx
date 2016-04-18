@@ -2,9 +2,13 @@ import luxe.Component;
 import luxe.Vector;
 import luxe.Entity;
 
+import luxe.tween.Actuate;
+
 import physics2d.components.Physics2DBody;
 
 import behavior.DamageReceiver;
+
+import scripting.ScriptSequencer;
 
 class CompositeEnemy extends Component
 {
@@ -12,7 +16,9 @@ class CompositeEnemy extends Component
 
     var weapon : Weapon;
     var player : Entity;
+    var player_body : Physics2DBody;
     var velocity : Vector = new Vector();
+    var move_speed : Float = 0;
 
     public var cap_type : Int = 0;
     public var move_type : Int = 0;
@@ -21,27 +27,100 @@ class CompositeEnemy extends Component
 
     var orig_pos : Vector = new Vector();
 
-    public function new(_player: Entity, _sound_player: SoundPlayer, ?_options: luxe.options.ComponentOptions)
+    // var sequence : ScriptSequencer;
+
+    public function new(_player: Entity, _weapon: Weapon, _sound_player: SoundPlayer, ?_options: luxe.options.ComponentOptions)
     {
         super(_options);
 
         player = _player;
         sound_player = _sound_player;
+        weapon = _weapon;
 
         dead_msg = [];
+
+        // sequence = new ScriptSequencer();
+        // sequence.loop =
+        //
+        // sequence.add({
+        //     name: '1',
+        //     func: move_y_mid,
+        //     num: 1
+        // });
+    }
+
+    inline function calc_time_from_speed(target: Vector) : Float
+    {
+        var delta = Vector.Subtract(entity.pos, target).length;
+
+        return (delta / move_speed);
+    }
+
+    function move_y_mid()
+    {
+        if (entity == null || entity.destroyed) return;
+
+        var tgt = new Vector(entity.pos.x, Luxe.camera.size.y / 2);
+        var d = calc_time_from_speed(tgt);
+
+        Actuate.tween(entity.pos, d, { x: tgt.x, y: tgt.y }).onComplete(move_left);
+    }
+
+    function move_left()
+    {
+        if (entity == null || entity.destroyed) return;
+
+        var tgt = new Vector(40, entity.pos.y);
+        var d = calc_time_from_speed(tgt);
+
+        Actuate.tween(entity.pos, d, { x: tgt.x, y: tgt.y }).onComplete(move_right);
+    }
+
+    function move_right()
+    {
+        if (entity == null || entity.destroyed) return;
+
+        var tgt = new Vector(Luxe.camera.size.x - 40, entity.pos.y);
+        var d = calc_time_from_speed(tgt);
+
+        Actuate.tween(entity.pos, d, { x: tgt.x, y: tgt.y }).onComplete(move_mid);
+    }
+
+    function move_mid()
+    {
+        if (entity == null || entity.destroyed) return;
+
+        var tgt = new Vector(Luxe.camera.size.x / 2, 100);
+        var d = calc_time_from_speed(tgt);
+
+        Actuate.tween(entity.pos, d, { x: tgt.x, y: tgt.y }).onComplete(move_y_mid);
     }
 
     override function init()
     {
         orig_pos.copy_from(entity.pos);
 
+        player_body = player.get("Physics2DBody");
 
+        add_death_checks();
+
+        calc_stats();
+
+        move_y_mid();
+    }
+
+    function add_death_checks()
+    {
+        for (child in entity.children)
+        {
+            dead_msg.push(child.events.listen(DamageReceiver.message, ondead));
+        }
     }
 
     function calc_stats()
     {
-        var def = 0;
-        var spd = 0;
+        var def = 0.0;
+        var spd = 100.0;
 
         for (child in entity.children)
         {
@@ -56,11 +135,37 @@ class CompositeEnemy extends Component
             {
                 def += 1;
             }
+
+            if (type == "2")
+            {
+                spd += 20;
+            }
         }
+
+        def /= entity.children.length;
 
         for (child in entity.children)
         {
+            var hp : DamageReceiver = child.get('DamageReceiver');
+            hp.hitpoints = Math.ceil(def);
+        }
 
+        move_speed = spd;
+
+        trace('calc_stats for ${entity.name} - spd: $spd def: $def');
+    }
+
+    function ondead(e: Entity)
+    {
+        sound_player.play('enemy_explodes', 0.7);
+        e.parent = null;
+        e.destroy();
+        calc_stats();
+
+        if (entity.children.length == 0)
+        {
+            Actuate.stop(entity.pos, null, false, false);
+            entity.destroy();
         }
     }
 
@@ -78,20 +183,33 @@ class CompositeEnemy extends Component
 
     override function ondestroy()
     {
-        //entity.events.unlisten(dead_msg);
+        while (dead_msg.length > 0) dead_msg.pop();
     }
 
-    function ondead(_)
+    function check_fire()
     {
-        sound_player.play('enemy_explodes', 0.7);
-        entity.destroy();
+        if (weapon == null || !weapon.can_fire()) return;
+
+        var player_pos = player_body.proxy_pos;
+
+        if (player_pos == null) return;
+
+        var dir = Vector.Subtract(player_pos, entity.pos);
+
+        var first = false;
+        for (child in entity.children)
+        {
+            if (child.name.charAt(5) == "0")
+            {
+                weapon.fire(dir, first, Vector.Subtract(child.pos, entity.origin));
+                first = false;
+            }
+        }
     }
 
     var a : Float = 0;
     function ai_step(dt: Float)
     {
-        entity.rotation.setFromEuler(new Vector(0, 0, a));
-
-        a += 1*dt;
+        check_fire();
     }
 }

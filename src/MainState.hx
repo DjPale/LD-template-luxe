@@ -49,7 +49,6 @@ class MainState extends State
     var score_txt : Text;
     var hull_txt : Text;
     var lvl_txt : Text;
-    var background : Sprite;
 
     var dispatcher : MessageDispatcher;
     var factory : TiledMapObjectFactory;
@@ -125,8 +124,6 @@ class MainState extends State
         update_hud();
 
         spawner.update(dt);
-
-        background.uv.y -= 40 * dt;
     }
 
     function start_level()
@@ -210,6 +207,8 @@ class MainState extends State
 
         sound_player = new SoundPlayer();
 
+        setup_background();
+
         setup_player();
 
         spawner = new EnemySpawner(physics2d, player, sound_player);
@@ -229,6 +228,30 @@ class MainState extends State
         spawner.spawn_composite(new Vector(100, 200));
 
         has_done_init = true;
+    }
+
+    function setup_background() {
+
+        new Sprite({
+            name : 'background',
+            size : new Vector(Luxe.screen.w, Luxe.screen.h),
+            color : new Color(0, 0, 0, 1),
+            pos : new Vector(0, 0),
+            depth: -10
+        });
+
+        var star : Sprite;
+        for( i in 0...150 ) {
+
+            star = new Sprite({
+                name : 'star'+i,
+                size : new Vector(1, 1),
+                color : new Color(1, 1, 1, 1),
+                pos : new Vector(Luxe.utils.random.int(0, Luxe.screen.w), Luxe.utils.random.int(0, Luxe.screen.h))
+            });
+
+            star.add(new StarComponent());
+        }
     }
 
     function setup_player()
@@ -324,16 +347,6 @@ class MainState extends State
         hud.texture.filter_min = hud.texture.filter_mag = FilterType.nearest;
 
         var ratio = Luxe.screen.w / Luxe.screen.h;
-
-    	background = new Sprite({
-    		name: 'background',
-    		texture: Luxe.resources.texture('assets/background.png'),
-    		size: new Vector(Luxe.screen.w, Luxe.screen.w / ratio),
-    		centered: false,
-    		depth: -1
-    		});
-
-    	background.texture.clamp_s = background.texture.clamp_t = phoenix.Texture.ClampType.repeat;
     }
 
     function update_hud()
@@ -377,7 +390,6 @@ class MainState extends State
 
     function show_shit(visible: Bool)
     {
-        background.visible = visible;
         hud.visible = visible;
         global.canvas.visible = visible;
         score_txt.visible = visible;

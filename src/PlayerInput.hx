@@ -254,7 +254,7 @@ class PlayerInput extends luxe.Component
         if (previous_player_state != player_state) {
 
             previous_player_state = player_state;
-            sound_player.play('transform');
+            sound_player.play('transform', 0.5);
         }
 
         animation.animation = player_state + '_' + player_direction;

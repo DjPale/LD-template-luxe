@@ -1,6 +1,9 @@
+import luxe.Color;
 import luxe.Input;
 import luxe.Sprite;
 import luxe.Vector;
+
+import luxe.tween.Actuate;
 
 import luxe.components.sprite.SpriteAnimation;
 import physics2d.components.Physics2DBody;
@@ -32,6 +35,8 @@ class PlayerInput extends luxe.Component
     var msg_col : String;
     var sound_player : SoundPlayer;
 
+    var ui_shapes : Map<Int, Sprite>;
+
     public function new(_phys: Physics2DBody, _cap: ShapeCapabilities, _weapon: Weapon, _animation: SpriteAnimation, _sound_player: SoundPlayer, ?_options: luxe.options.ComponentOptions)
     {
         super(_options);
@@ -59,6 +64,36 @@ class PlayerInput extends luxe.Component
         msg_col = entity.events.listen(Physics2DBody.message, oncollision);
 
         dmg_recv = entity.get('DamageReceiver');
+
+        ui_shapes = [
+            0 =>
+            new Sprite({
+                name: '1',
+                pos: new Vector(31, Luxe.camera.size.y - 32),
+                color: new Color(0, 0, 0, 0),
+                size: new Vector(78, 32),
+                centered: false,
+                depth: 1
+            }),
+            1 =>
+            new Sprite({
+                name: '2',
+                pos: new Vector(111, Luxe.camera.size.y - 32),
+                color: new Color(0, 0, 0, 0.75),
+                size: new Vector(78, 32),
+                centered: false,
+                depth: 1
+            }),
+            2 =>
+            new Sprite({
+                name: '3',
+                pos: new Vector(191, Luxe.camera.size.y - 32),
+                color: new Color(0, 0, 0, 0.75),
+                size: new Vector(78, 32),
+                centered: false,
+                depth: 1
+            })
+        ];
     }
 
     override public function update(dt: Float)
@@ -76,8 +111,18 @@ class PlayerInput extends luxe.Component
 
             if (auto_switch_cnt <= 0)
             {
-                trace('try to change to ' + ((cap.current_shape + 1) % 3));
-                change_shape((cap.current_shape + 1) % 3);
+
+                var next_shape = ((cap.current_shape + 1) % 3);
+                trace('try to change to ' + next_shape);
+                change_shape(next_shape);
+
+                for(shape in ui_shapes) {
+                    shape.color.a = 0.75;
+                }
+
+                ui_shapes[next_shape].color.a = 0;
+                Actuate.tween(ui_shapes[next_shape].color, 3, { a: 0.75 });
+
             }
         }
     }

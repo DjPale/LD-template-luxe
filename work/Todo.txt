@@ -40,8 +40,6 @@ x Auto-rotate abilities flag
 - Rotating enemies
 
 ## c2
-    - Cooldown visuals!
-
     - Particle fx
         - Explosion
         - Afterburn

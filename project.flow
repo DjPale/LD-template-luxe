@@ -26,7 +26,7 @@
         hscript : '*'
       },
       defines : ['hscriptPos', 'no_debug_console'],
-      flags: ['-dce std']
+      flags: ['-dce std', '--no-traces']
     },
 
     files : {

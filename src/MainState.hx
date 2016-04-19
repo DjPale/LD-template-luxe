@@ -105,6 +105,8 @@ class MainState extends State
 
     override function onkeydown(event: KeyEvent)
     {
+        return;
+
         if (event.keycode == Key.key_r)
         {
             reset_level();

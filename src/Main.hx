@@ -28,7 +28,9 @@ class Main extends luxe.Game
         config.preload.jsons.push({id: 'assets/parcel.json'});
         config.render.depth = 24;
 
+#if web
         config.runtime.prevent_default_keys.push(Key.space);
+#end
 
         return config;
     }

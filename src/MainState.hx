@@ -48,7 +48,7 @@ class MainState extends State
     var hud : Sprite;
     var score_txt : Text;
     var hull_txt : Text;
-    var lvl_txt : Text;
+    var hi_score_txt : Text;
 
     var dispatcher : MessageDispatcher;
     var factory : TiledMapObjectFactory;
@@ -61,6 +61,9 @@ class MainState extends State
 
     var msg_reset : String;
     var mouse: Vector;
+
+    var score : Int = 0;
+    var hi_score : Int = 0;
 
     public var has_done_init : Bool = false;
 
@@ -134,7 +137,11 @@ class MainState extends State
         }
         if (event.keycode == Key.key_c)
         {
-            spawner.spawn_composite(new Vector(150, -16));
+            spawner.spawn_composite(new Vector(150, -16), Luxe.utils.random.int(0, 3));
+        }
+        if (event.keycode == Key.key_d)
+        {
+            physics2d.draw = !physics2d.draw;
         }
     }
 
@@ -152,6 +159,7 @@ class MainState extends State
 
     function reset_level_delayed(_)
     {
+        spawner.xplosion(player.pos);
         player.visible = false;
         player_inp.input_enabled = false;
 
@@ -164,6 +172,16 @@ class MainState extends State
     function reset_level()
     {
         if (global.states.current_state != this) return;
+
+        if (score > hi_score)
+        {
+            Actuate.stop(hi_score_txt.color);
+            hi_score_txt.color.a = 1;
+            Actuate.tween(hi_score_txt.color, 0.2, { a: 0 }).repeat(3).reflect();
+            hi_score = score;
+        }
+
+        score = 0;
 
         reset_scene.empty();
         reset_player();
@@ -180,6 +198,7 @@ class MainState extends State
             return;
         }
 
+        score = 0;
         reset_scene = new Scene('reset_scene');
 
         watcher = new DebugWatcher();
@@ -195,7 +214,7 @@ class MainState extends State
         // light_batcher.on(postrender, function(b:Batcher){ Luxe.renderer.blend_mode(); });
 
         physics2d.gravity.set_xy(0, 0);
-        physics2d.draw = true;
+        physics2d.draw = false;
         physics2d.paused = false;
 
         physics2d.set_layer_collision(LAYER_PLAYER, LAYER_PLAYER_BULLET, false);
@@ -237,14 +256,12 @@ class MainState extends State
 
         setup_hud();
 
-        setup_debug();
+        //setup_debug();
 
         spawner.reset();
         spawner.run();
 
         msg_reset = Luxe.events.listen('LevelReset', reset_level_delayed);
-
-        spawner.spawn_composite(new Vector(100, 200));
 
         has_done_init = true;
     }
@@ -344,7 +361,6 @@ class MainState extends State
             pos: new Vector(10),
             point_size: 8,
             text: 'SCORE 0',
-            visible: false
         });
 
         hull_txt = new Text({
@@ -356,13 +372,13 @@ class MainState extends State
             text: 'HULL 1'
         });
 
-        lvl_txt = new Text({
-            name: 'lvl_txt',
+        hi_score_txt = new Text({
+            name: 'hi_score_txt',
             font: global.font,
             sdf: false,
-            pos: new Vector(Luxe.camera.size.x - 40, 40),
+            pos: new Vector(10,10),
             point_size: 8,
-            text: 'L1'
+            text: 'HI 0',
         });
 
         hud.texture.filter_min = hud.texture.filter_mag = FilterType.nearest;
@@ -372,8 +388,10 @@ class MainState extends State
 
     function update_hud()
     {
-        lvl_txt.text = 'L' + (spawner.level_idx + 1);
+        hi_score_txt.text = 'HI $hi_score';
         hull_txt.text = 'HULL ' + player_dmg.hitpoints;
+        score = Math.round((spawner.spawn_mark_idx - 1) * 100 + (spawner.spawn_interval - spawner.spawn_interval_cnt) * 20);
+        score_txt.text = 'SCORE $score';
     }
 
     function setup_debug()
@@ -414,7 +432,7 @@ class MainState extends State
         hud.visible = visible;
         global.canvas.visible = visible;
         score_txt.visible = visible;
-        lvl_txt.visible = visible;
+        hi_score_txt.visible = visible;
         hull_txt.visible = visible;
     }
 

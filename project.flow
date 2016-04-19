@@ -4,17 +4,17 @@
       width: 600,
       height: 800,
       resizable: false,
-      title: 'LD Template Luxe - 2016'
+      title: 'LD#35 - Space Shift by Digital Apathy'
     }
   },
 
   project : {
-    name : 'LD Template Luxe - 2016',
+    name : 'LD35 - Space Shift by Digital Apathy',
     version : '1.0.0',
-    author : 'dj_pale',
+    author : 'Digital Apathy',
 
     app : {
-      name : 'LD-template-2016',
+      name : 'LD35-SpaceShift',
       package : 'com.digitalapathy',
       codepaths : ['src', 'assets/scripts']
     },

@@ -2,6 +2,8 @@ import luxe.Vector;
 import luxe.Sprite;
 import luxe.Entity;
 import luxe.Scene;
+import luxe.Particles;
+import luxe.Color;
 
 import luxe.collision.shapes.Polygon;
 import luxe.collision.shapes.Circle;
@@ -25,6 +27,8 @@ class EnemySpawner
     public var spawn_row_ofs : Vector = new Vector(2, 4);
     public var running : Bool = false;
     public var scene : Scene;
+    public var xplosions : Array<ParticleSystem>;
+    var xplosion_idx : Int = 0;
 
     var spawn_blocks : Array<Array<String>> = [
         [
@@ -43,9 +47,9 @@ class EnemySpawner
         "       0       ",
         ],
         [
-        "   11      11  ",
+        "   11     11   ",
         "    11   11    ",
-        "     11111     ",
+        "     11 11     ",
         ],
         [
         "2  0       0  2",
@@ -58,39 +62,56 @@ class EnemySpawner
         "    2     2    ",
         ],
         [
-        "0   0   0   0  ",
-        " 0   0   0   0 ",
-        "  0   0   0   0",
-        ],
-        [
         "0 0 0 0 0 0 0 0",
         " 0 0 0 0 0 0 0 ",
         "0 0 0 0 0 0 0 0",
-        ]
+        ],
+        [
+        "       3       ",
+        "               ",
+        "               ",
+        ],
+        [
+        "       4       ",
+        "               ",
+        "               ",
+        ],
+        [
+        "       5       ",
+        "               ",
+        "               ",
+        "               ",
+        ],
     ];
 
     var composites : Array<Array<String>> = [
         [
         "22",
         "1",
-        "0"
+        "00"
         ],
         [
-        "0",
+         "0",
         "010",
-        "0"
+         "0"
         ],
-
+        [
+          "0",
+        "021120",
+        "021120",
+        "021120",
+          "0"
+        ]
     ];
 
     var spawn_marks : Array<String> = [
-        "x0x1x2x3x4x5x6x7"
+        "x0123xx7xxx4x5x8xx6x7xx9xx4x5x"
     ];
 
     public var level_idx(default,null) : Int = 0;
-    var spawn_mark_idx = 0;
+    public var spawn_mark_idx(default,null) : Int = 0;
 
-    var spawn_interval_cnt : Float = 0;
+    public var spawn_interval_cnt(default,null) : Float = 0;
 
     var physics2d : PhysicsEngine2D;
     var player : Entity;
@@ -103,6 +124,49 @@ class EnemySpawner
         sound_player = _sound_player;
 
         scene = Luxe.scene;
+
+        create_xplosions();
+    }
+
+    function create_xplosions()
+    {
+        xplosions = [];
+
+        for (i in 0...10)
+        {
+            var particles = new ParticleSystem({name:'particles-$i'});
+            particles.add_emitter({
+                name : 'xplosion',
+                start_color: new Color(1, 1, 1, 1).rgb(0xaaccee),
+                end_color: new Color(1, 1, 1, 0).rgb(0xaa2200),
+                pos: new Vector(0,0),
+                pos_random: new Vector(0, 0),
+                start_size: new Vector(6, 6),
+                speed_random: 10,
+                direction_random: 360.0,
+                end_size: new Vector(0, 0),
+                gravity : new Vector(0, 8),
+                life: 0.5,
+                depth: 20,
+                emit_time: 0.25,
+                emit_count: 12
+            });
+
+            particles.stop();
+
+            xplosions.push(particles);
+        }
+    }
+
+    public function xplosion(pos: Vector)
+    {
+        var p = xplosions[xplosion_idx];
+        p.pos.copy_from(pos);
+        p.start(0.25);
+
+        xplosion_idx++;
+
+        if (xplosion_idx >= xplosions.length) xplosion_idx = 0;
     }
 
     public function update(dt: Float)
@@ -163,12 +227,24 @@ class EnemySpawner
 
                 if (e_type != null)
                 {
-                    spawn_enemy(
-                        new Vector(
-                            ch_idx * (base_size + spawn_row_ofs.x) + base_size / 2 + 10,
-                            y_ofs * (base_size + spawn_row_ofs.y) - base_size / 2),
-                        e_type,
-                        idx % 3);
+                    if (e_type > 2)
+                    {
+                        spawn_composite(
+                            new Vector(
+                                ch_idx * (base_size + spawn_row_ofs.x) + base_size / 2 + 10,
+                                y_ofs * (base_size + spawn_row_ofs.y) - base_size / 2),
+                            e_type - 3
+                        );
+                    }
+                    else
+                    {
+                        spawn_enemy(
+                            new Vector(
+                                ch_idx * (base_size + spawn_row_ofs.x) + base_size / 2 + 10,
+                                y_ofs * (base_size + spawn_row_ofs.y) - base_size / 2),
+                            e_type,
+                            idx % 3);
+                    }
                 }
             }
         }
@@ -214,7 +290,7 @@ class EnemySpawner
         var cap = new ShapeCapabilities(weapon, phys, dmg_recv, { name: 'ShapeCapabilities' });
         sprite.add(cap);
 
-        var be = new BasicEnemy(player, phys, cap, sound_player, { name: 'BasicEnemy' });
+        var be = new BasicEnemy(player, phys, cap, sound_player, this, { name: 'BasicEnemy' });
 
         if (_type == -1)
         {
@@ -244,14 +320,18 @@ class EnemySpawner
         return sprite;
     }
 
-    public function spawn_composite(spos: Vector)
+    public function spawn_composite(spos: Vector, num: Int)
     {
-        var template = composites[0];
+        if (num < 0 || num >= composites.length) return;
+
+        var template = composites[num];
         var en_sz = 16;
 
         var parent_enemy = new Entity({
             name: 'enemy.composite',
+            name_unique: true,
             pos: spos,
+            scene: scene,
             origin: new Vector(10, 10)
         });
 
@@ -262,7 +342,7 @@ class EnemySpawner
         weapon.scene = scene;
         parent_enemy.add(weapon);
 
-        var comp_en = new CompositeEnemy(player,  weapon, sound_player, { name: 'CompositeEnemy' });
+        var comp_en = new CompositeEnemy(player,  weapon, sound_player, this, { name: 'CompositeEnemy' });
         parent_enemy.add(comp_en);
 
         // max height
@@ -287,10 +367,12 @@ class EnemySpawner
 
                 var part = new Sprite({
                     name: 'part.$m.$row_idx-$idx',
+                    name_unique: true,
                     parent: parent_enemy,
                     size: new Vector(en_sz, en_sz),
                     texture: Luxe.resources.texture('assets/gfx/enemies.png'),
                     centered: true,
+                    scene: scene,
                     pos: new Vector(
                         (((max_w - row_l) * en_sz) / 2) + (idx * en_sz),
                         ((max_h * en_sz) / 2) - (row_idx * en_sz)

@@ -111,7 +111,7 @@ class MenuState extends State
         txt_credits = new Text({
             name: 'Credits',
             font: global.font,
-            text: 'DIGITAL APATHY\nCODE - DJ_PALE\nGFX AND ASS.CODE - PLINK\nMUSIC - SKURK',
+            text: 'DIGITAL APATHY\nCODE - DJ_PALE\nGFX AND ASS.CODE - PLINK\nMUSIC - SKURK\n\nLD#35 - SHAPESHIFT',
             sdf: false,
             align : TextAlign.center,
             align_vertical : TextAlign.center,

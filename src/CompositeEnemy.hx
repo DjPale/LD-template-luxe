@@ -24,18 +24,20 @@ class CompositeEnemy extends Component
     public var move_type : Int = 0;
 
     var sound_player : SoundPlayer;
+    var spawner: EnemySpawner;
 
     var orig_pos : Vector = new Vector();
 
     // var sequence : ScriptSequencer;
 
-    public function new(_player: Entity, _weapon: Weapon, _sound_player: SoundPlayer, ?_options: luxe.options.ComponentOptions)
+    public function new(_player: Entity, _weapon: Weapon, _sound_player: SoundPlayer, _spawner: EnemySpawner, ?_options: luxe.options.ComponentOptions)
     {
         super(_options);
 
         player = _player;
         sound_player = _sound_player;
         weapon = _weapon;
+        spawner = _spawner;
 
         dead_msg = [];
 
@@ -158,6 +160,7 @@ class CompositeEnemy extends Component
     function ondead(e: Entity)
     {
         sound_player.play('enemy_explodes', 0.7);
+        spawner.xplosion(e.transform.world.pos);
         e.parent = null;
         e.destroy();
         calc_stats();
@@ -194,15 +197,16 @@ class CompositeEnemy extends Component
 
         if (player_pos == null) return;
 
-        var dir = Vector.Subtract(player_pos, entity.pos);
-
         var first = false;
         for (child in entity.children)
         {
             if (child.name.charAt(5) == "0")
             {
+                var dir = Vector.Subtract(player_pos, child.transform.world.pos);
+
                 weapon.fire(dir, first, Vector.Subtract(child.pos, entity.origin));
-                first = false;
+                first = true;
+                trace('fire from ${child.name}');
             }
         }
     }

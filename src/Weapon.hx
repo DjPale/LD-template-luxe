@@ -53,11 +53,12 @@ class Weapon extends Component
     {
         if (!_ignore_cooldown && fire_rate_cnt > 0) return false;
 
-        var volume = 1.0;
+        var volume = 0.5;
         if (entity.name != 'player') {
             volume = 0.1;
         }
-        sound_player.play('blaster', volume);
+
+        if (!_ignore_cooldown) sound_player.play('blaster', volume);
 
         fire_rate_cnt = fire_rate;
 
